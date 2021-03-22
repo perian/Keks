@@ -1,4 +1,4 @@
-`use strict`;
+"use strict";
 
 const OBJECTS_AMOUNT = 8;
 const OFFER_FEATURES = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
@@ -9,8 +9,7 @@ const MAP_PIN_WIDTH = 50;
 const MAP_PIN_HEIGHT = 70;
 const map = document.querySelector(`.map`);
 const mapPins = map.querySelector(`.map__pins`);
-const mapPin = map.querySelector(`.map__pin`);
-const filtersContainer = map.querySelector('.map__filters-container');
+const filtersContainer = map.querySelector(`.map__filters-container`);
 const pinTemplate = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
 const popupTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
 
@@ -19,17 +18,17 @@ const houseTypes = {
   flat: `Квартира`,
   house: `Дом`,
   bungalow: `Бунгало`
-}
+};
 
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //Максимум не включается, минимум включается
+  return Math.floor(Math.random() * (max - min)) + min;   // Максимум не включается, минимум включается
 };
 
 const getRandomArrayElement = (array) => {
   return array[getRandomInt(0, array.length)];
-}
+};
 
 const setRandomArrayLength = (array) => {
   const randomLengthNum = getRandomInt(0, array.length);
@@ -40,7 +39,7 @@ const setRandomArrayLength = (array) => {
   }
 
   return randomLengthArray;
-}
+};
 
 const createFeatures = () => {
   const dataArray = [];
@@ -72,7 +71,7 @@ const createFeatures = () => {
   }
 
   return dataArray;
-}
+};
 
 const pinFeatures = createFeatures();
 
@@ -105,13 +104,13 @@ const createPopupFeature = (featuresArray) => {
   element.classList.add(`popup__feature`, popupClassModificator);
 
   return element;
-}
+};
 
 const createPopup = (featuresArray) => {
   let popupElement = popupTemplate.cloneNode(true);
   popupElement.querySelector(`.popup__title`).textContent = featuresArray.offer.title;
   popupElement.querySelector(`.popup__text--address`).textContent = featuresArray.offer.address;
-  popupElement.querySelector(`.popup__text--price`).innerHTML = featuresArray.offer.price + `&#x20bd;<span>/ночь</span>`; /*удалит <span> из шаблона?*/
+  popupElement.querySelector(`.popup__text--price`).innerHTML = featuresArray.offer.price + `&#x20bd;<span>/ночь</span>`;
   popupElement.querySelector(`.popup__type`).textContent = houseTypes[featuresArray.offer.type];
   popupElement.querySelector(`.popup__text--capacity`).textContent = featuresArray.offer.rooms + ` комнаты для ` + featuresArray.offer.guests + ` гостей`;
   popupElement.querySelector(`.popup__text--time`).textContent = `Заезд после ` + featuresArray.offer.checkin + `, выезд до ` + featuresArray.offer.checkout;
@@ -121,14 +120,14 @@ const createPopup = (featuresArray) => {
 
 
   for (let i = 0; i < featuresArray.offer.features.length; i++) {
-    fragment.appendChild(createPopupFeature(featuresArray.offer.features[i]))
+    fragment.appendChild(createPopupFeature(featuresArray.offer.features[i]));
   }
   let popupFeatures = popupElement.querySelector(`.popup__features`);
   popupFeatures.innerHTML = ``;
   popupFeatures.appendChild(fragment);
 
   return popupElement;
-}
+};
 
 map.insertBefore(createPopup(pinFeatures[0]), filtersContainer);
 // В блок .popup__photos выведите все фотографии из списка offer.photos. Каждая из строк массива photos должна записываться как src соответствующего изображения.

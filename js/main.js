@@ -30,15 +30,9 @@ const getRandomArrayElement = (array) => {
   return array[getRandomInt(0, array.length)];
 };
 
-const setRandomArrayLength = (array) => {
-  const randomLengthNum = getRandomInt(0, array.length);
-  let randomLengthArray = [];
-
-  for (let i = 0; i <= randomLengthNum; i++) {
-    randomLengthArray.push(array[i]);
-  }
-
-  return randomLengthArray;
+const getRandomArrayLength = (array) => {
+  const newArrayLength = getRandomInt(0, array.length);
+  return array.slice(0, newArrayLength);
 };
 
 const createFeatures = () => {
@@ -57,9 +51,9 @@ const createFeatures = () => {
         guests: getRandomInt(1, 3),
         checkin: getRandomArrayElement(CHECK_IN_OUT_TIMINGS),
         checkout: getRandomArrayElement(CHECK_IN_OUT_TIMINGS),
-        features: setRandomArrayLength(OFFER_FEATURES),
+        features: getRandomArrayLength(OFFER_FEATURES),
         description: `Описание`,
-        photos: setRandomArrayLength(HOTELS_PHOTOS)
+        photos: getRandomArrayLength(HOTELS_PHOTOS)
       },
       location: {
         x: getRandomInt(130, 1200),
@@ -100,34 +94,65 @@ mapPins.appendChild(fragment);
 const createPopupFeature = (featuresArray) => {
   const element = document.createElement(`li`);
 
-  let popupClassModificator = `popup__feature--` + featuresArray;
+  const popupClassModificator = `popup__feature--` + featuresArray;
   element.classList.add(`popup__feature`, popupClassModificator);
 
   return element;
 };
 
+const createPopupPhoto = (src) => {
+  const photoElement = popupTemplate.querySelector(`.popup__photo`).cloneNode(true);
+
+  photoElement.src = src;
+
+  return photoElement;
+}
+
 const createPopup = (featuresArray) => {
-  let popupElement = popupTemplate.cloneNode(true);
+  const popupElement = popupTemplate.cloneNode(true);
+  const popupDescription = popupElement.querySelector(`.popup__description`);
+  const popupAvatar = popupElement.querySelector(`.popup__avatar`);
+  const featuresList = popupElement.querySelector(`.popup__features`);
+  const photoList = popupElement.querySelector(`.popup__photos`);
+
   popupElement.querySelector(`.popup__title`).textContent = featuresArray.offer.title;
   popupElement.querySelector(`.popup__text--address`).textContent = featuresArray.offer.address;
   popupElement.querySelector(`.popup__text--price`).innerHTML = featuresArray.offer.price + `&#x20bd;<span>/ночь</span>`;
   popupElement.querySelector(`.popup__type`).textContent = houseTypes[featuresArray.offer.type];
   popupElement.querySelector(`.popup__text--capacity`).textContent = featuresArray.offer.rooms + ` комнаты для ` + featuresArray.offer.guests + ` гостей`;
   popupElement.querySelector(`.popup__text--time`).textContent = `Заезд после ` + featuresArray.offer.checkin + `, выезд до ` + featuresArray.offer.checkout;
-  popupElement.querySelector(`.popup__description`).textContent = featuresArray.offer.description;
-  popupElement.querySelector(`.popup__photos`).textContent = featuresArray.offer.description;
-  popupElement.querySelector(`.popup__avatar`).src = featuresArray.author.avatar;
 
-
-  for (let i = 0; i < featuresArray.offer.features.length; i++) {
-    fragment.appendChild(createPopupFeature(featuresArray.offer.features[i]));
+  popupDescription.textContent = featuresArray.offer.description;
+  if (featuresArray.offer.description === (undefined || ``)) {
+    popupDescription.remove();
   }
-  let popupFeatures = popupElement.querySelector(`.popup__features`);
-  popupFeatures.innerHTML = ``;
-  popupFeatures.appendChild(fragment);
+
+  popupAvatar.src = featuresArray.author.avatar;
+  if (featuresArray.author.avatar === (undefined || ``)) {
+    popupAvatar.remove();
+  }
+
+  if (featuresArray.offer.features.length > 0) {
+    for (let i = 0; i < featuresArray.offer.features.length; i++) {
+      fragment.appendChild(createPopupFeature(featuresArray.offer.features[i]));
+    }
+    featuresList.innerHTML = ``;
+    featuresList.appendChild(fragment);
+  } else {
+    featuresList.remove();
+  }
+
+  if (featuresArray.offer.photos.length > 0) {
+    for (let i = 0; i < featuresArray.offer.photos.length; i++) {
+      fragment.appendChild(createPopupPhoto(featuresArray.offer.photos[i]));
+    }
+    photoList.innerHTML = ``;
+    photoList.appendChild(fragment);
+  } else {
+    photoList.remove();
+  }
 
   return popupElement;
 };
 
 map.insertBefore(createPopup(pinFeatures[0]), filtersContainer);
-// В блок .popup__photos выведите все фотографии из списка offer.photos. Каждая из строк массива photos должна записываться как src соответствующего изображения.

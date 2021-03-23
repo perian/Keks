@@ -106,7 +106,7 @@ const createPopupPhoto = (src) => {
   photoElement.src = src;
 
   return photoElement;
-}
+};
 
 const createPopup = (featuresArray) => {
   const popupElement = popupTemplate.cloneNode(true);

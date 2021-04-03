@@ -7,18 +7,19 @@ const HOTELS_PHOTOS = [`http://o0.github.io/assets/images/tokyo/hotel1.jpg`, `ht
 const HOUSE_TYPES = [`palace`, `flat`, `house`, `bungalow`];
 const MAP_PIN_WIDTH = 50;
 const MAP_PIN_HEIGHT = 70;
+const MAIN_PIN_POINTER_HEIGHT = 22;
 const map = document.querySelector(`.map`);
 const mapPins = map.querySelector(`.map__pins`);
-const filtersContainer = map.querySelector(`.map__filters-container`);
+// const filtersContainer = map.querySelector(`.map__filters-container`);
 const pinTemplate = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
-const popupTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
+// const popupTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
 
-const houseTypes = {
-  palace: `Дворец`,
-  flat: `Квартира`,
-  house: `Дом`,
-  bungalow: `Бунгало`
-};
+// const houseTypes = {
+//   palace: `Дворец`,
+//   flat: `Квартира`,
+//   house: `Дом`,
+//   bungalow: `Бунгало`
+// };
 
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
@@ -69,8 +70,6 @@ const createFeatures = () => {
 
 const pinFeatures = createFeatures();
 
-map.classList.remove(`map--faded`);
-
 const createPin = (featuresArray) => {
   let pinElement = pinTemplate.cloneNode(true);
   let img = pinElement.querySelector(`img`);
@@ -91,6 +90,9 @@ for (let i = 0; i < pinFeatures.length; i++) {
 
 mapPins.appendChild(fragment);
 
+
+// Создание и отрисовка карточки
+/*
 const createPopupFeature = (featuresArray) => {
   const element = document.createElement(`li`);
 
@@ -110,8 +112,8 @@ const createPopupPhoto = (src) => {
 
 const createPopup = (featuresArray) => {
   const popupElement = popupTemplate.cloneNode(true);
-  const popupDescription = popupElement.querySelector(`.popup__description`);
   const popupAvatar = popupElement.querySelector(`.popup__avatar`);
+  const popupDescription = popupElement.querySelector(`.popup__description`);
   const featuresList = popupElement.querySelector(`.popup__features`);
   const photoList = popupElement.querySelector(`.popup__photos`);
 
@@ -156,3 +158,40 @@ const createPopup = (featuresArray) => {
 };
 
 map.insertBefore(createPopup(pinFeatures[0]), filtersContainer);
+*/
+
+
+// Неактивное состояние формы обьявления
+const adForm = document.querySelector(`.ad-form`);
+const mapFilters = document.querySelector(`.map__filters`);
+const adFieldsets = adForm.querySelectorAll(`fieldset`);
+
+const disableAllElements = (element, array, boolean) => {
+  for (let element of array) {
+    element.disabled = boolean;
+  }
+};
+
+disableAllElements(`fieldset`, adFieldsets, true);
+disableAllElements(`select`, mapFilters, true);
+
+// Активное состояние страницы
+const mapMainPin = mapPins.querySelector(`.map__pin--main`);
+const MAIN_MOUSE_BUTTON = 0;
+mapMainPin.addEventListener(`mousedown`, function (evt) {
+  if (evt.button === MAIN_MOUSE_BUTTON) {
+    disableAllElements(`fieldset`, adFieldsets, false);
+    disableAllElements(`select`, mapFilters, false);
+
+    map.classList.remove(`map--faded`);
+
+    inputAddress.value = mainPinX + `, ` + (mainPinY + mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT);
+  }
+});
+
+// Выбор адреса на карте. Вычисление координат метки
+const inputAddress = document.querySelector(`#address`);
+const mainPinX = parseInt(mapMainPin.style.left.slice(0, -2), 10) + mapMainPin.offsetWidth / 2;
+const mainPinY = parseInt(mapMainPin.style.top.slice(0, -2), 10) + mapMainPin.offsetHeight / 2;
+
+inputAddress.value = mainPinX + `, ` + mainPinY;

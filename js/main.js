@@ -156,14 +156,14 @@ const filterSelects = document.querySelector(`.map__filters`).children;
 const adForm = document.querySelector(`.ad-form`);
 const adFieldsets = adForm.querySelectorAll(`fieldset`);
 
-const isDisableAllElements = (domElements, exist) => {
+const toggleFormElementsState = (domElements, exist) => {
   for (let element of domElements) {
     element.disabled = exist;
   }
 };
 
-isDisableAllElements(adFieldsets, true);
-isDisableAllElements(filterSelects, true);
+toggleFormElementsState(adFieldsets, true);
+toggleFormElementsState(filterSelects, true);
 
 // Активное состояние страницы
 const mapMainPin = mapPins.querySelector(`.map__pin--main`);
@@ -172,8 +172,8 @@ const MAIN_MOUSE_BUTTON = 0;
 const fragment = document.createDocumentFragment();
 
 const activateMap = () => {
-  isDisableAllElements(adFieldsets, false);
-  isDisableAllElements(filterSelects, false);
+  toggleFormElementsState(adFieldsets, false);
+  toggleFormElementsState(filterSelects, false);
 
   map.classList.remove(`map--faded`);
 
@@ -214,18 +214,21 @@ const HUNDREAD_ROOMS = 100;
 const NOT_FOR_GUEST = 0;
 
 const roomNumberCapacityValidation = () => {
-  roomCapacity.invalid = true;
 
   let roomNumbersAmount = parseInt(roomNumber.value, 10);
   let roomCapacityAmount = parseInt(roomCapacity.value, 10);
 
   if (roomNumbersAmount < roomCapacityAmount) {
+    roomCapacity.invalid = true;
     roomCapacity.setCustomValidity(`Максимум гостей ${roomNumbersAmount}`);
   } else if (roomNumbersAmount === HUNDREAD_ROOMS && roomCapacityAmount !== NOT_FOR_GUEST) {
     roomCapacity.setCustomValidity(`Не для гостей`);
+    roomCapacity.invalid = true;
   } else if (roomNumbersAmount < HUNDREAD_ROOMS && roomCapacityAmount === NOT_FOR_GUEST) {
+    roomCapacity.invalid = true;
     roomCapacity.setCustomValidity(`Поселите хоть кого-нибудь!`);
   } else {
+    roomCapacity.valid = true;
     roomCapacity.setCustomValidity(``);
   }
   roomCapacity.reportValidity();

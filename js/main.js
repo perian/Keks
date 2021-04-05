@@ -14,7 +14,7 @@ const mapPins = map.querySelector(`.map__pins`);
 const pinTemplate = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
 // const popupTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
 
-// const houseTypes = {
+// const HouseTypes = {
 //   palace: `Дворец`,
 //   flat: `Квартира`,
 //   house: `Дом`,
@@ -82,15 +82,6 @@ const createPin = (featuresArray) => {
   return pinElement;
 };
 
-const fragment = document.createDocumentFragment();
-
-for (let i = 0; i < pinFeatures.length; i++) {
-  fragment.appendChild(createPin(pinFeatures[i]));
-}
-
-mapPins.appendChild(fragment);
-
-
 // Создание и отрисовка карточки
 /*
 const createPopupFeature = (featuresArray) => {
@@ -120,7 +111,7 @@ const createPopup = (featuresArray) => {
   popupElement.querySelector(`.popup__title`).textContent = featuresArray.offer.title;
   popupElement.querySelector(`.popup__text--address`).textContent = featuresArray.offer.address;
   popupElement.querySelector(`.popup__text--price`).innerHTML = featuresArray.offer.price + `&#x20bd;<span>/ночь</span>`;
-  popupElement.querySelector(`.popup__type`).textContent = houseTypes[featuresArray.offer.type];
+  popupElement.querySelector(`.popup__type`).textContent = HouseTypes[featuresArray.offer.type];
   popupElement.querySelector(`.popup__text--capacity`).textContent = featuresArray.offer.rooms + ` комнаты для ` + featuresArray.offer.guests + ` гостей`;
   popupElement.querySelector(`.popup__text--time`).textContent = `Заезд после ` + featuresArray.offer.checkin + `, выезд до ` + featuresArray.offer.checkout;
 
@@ -160,34 +151,53 @@ const createPopup = (featuresArray) => {
 map.insertBefore(createPopup(pinFeatures[0]), filtersContainer);
 */
 
-
 // Неактивное состояние формы обьявления
+const filterSelects = document.querySelector(`.map__filters`).children;
 const adForm = document.querySelector(`.ad-form`);
-const mapFilters = document.querySelector(`.map__filters`);
 const adFieldsets = adForm.querySelectorAll(`fieldset`);
 
-const disableAllElements = (element, array, boolean) => {
-  for (let element of array) {
-    element.disabled = boolean;
+const isDisableAllElements = (domElements, exist) => {
+  for (let element of domElements) {
+    element.disabled = exist;
   }
 };
 
-disableAllElements(`fieldset`, adFieldsets, true);
-disableAllElements(`select`, mapFilters, true);
+isDisableAllElements(adFieldsets, true);
+isDisableAllElements(filterSelects, true);
 
 // Активное состояние страницы
 const mapMainPin = mapPins.querySelector(`.map__pin--main`);
 const MAIN_MOUSE_BUTTON = 0;
-mapMainPin.addEventListener(`mousedown`, function (evt) {
-  if (evt.button === MAIN_MOUSE_BUTTON) {
-    disableAllElements(`fieldset`, adFieldsets, false);
-    disableAllElements(`select`, mapFilters, false);
 
-    map.classList.remove(`map--faded`);
+const fragment = document.createDocumentFragment();
 
-    inputAddress.value = mainPinX + `, ` + (mainPinY + mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT);
+const activateMap = () => {
+  isDisableAllElements(adFieldsets, false);
+  isDisableAllElements(filterSelects, false);
+
+  map.classList.remove(`map--faded`);
+
+  for (let i = 0; i < pinFeatures.length; i++) {
+    fragment.appendChild(createPin(pinFeatures[i]));
   }
-});
+
+  mapPins.appendChild(fragment);
+
+  inputAddress.value = mainPinX + `, ` + (mainPinY + mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT);
+  adForm.classList.remove(`ad-form--disabled`);
+};
+
+const onMainPinMouseClick = (evt) => {
+  if (evt.button === MAIN_MOUSE_BUTTON || evt.key === `Enter`) {
+    activateMap();
+
+    mapMainPin.removeEventListener(`mousedown`, onMainPinMouseClick);
+    mapMainPin.removeEventListener(`keydown`, onMainPinMouseClick);
+  }
+};
+
+mapMainPin.addEventListener(`mousedown`, onMainPinMouseClick);
+mapMainPin.addEventListener(`keydown`, onMainPinMouseClick);
 
 // Выбор адреса на карте. Вычисление координат метки
 const inputAddress = document.querySelector(`#address`);
@@ -195,3 +205,36 @@ const mainPinX = parseInt(mapMainPin.style.left.slice(0, -2), 10) + mapMainPin.o
 const mainPinY = parseInt(mapMainPin.style.top.slice(0, -2), 10) + mapMainPin.offsetHeight / 2;
 
 inputAddress.value = mainPinX + `, ` + mainPinY;
+
+// Валидация Количество комнат - Количество мест
+
+const roomNumber = adForm.querySelector(`#room_number`);
+const roomCapacity = adForm.querySelector(`#capacity`);
+const HUNDREAD_ROOMS = 100;
+const NOT_FOR_GUEST = 0;
+
+const roomNumberCapacityValidation = () => {
+  roomCapacity.invalid = true;
+
+  let roomNumbersAmount = parseInt(roomNumber.value, 10);
+  let roomCapacityAmount = parseInt(roomCapacity.value, 10);
+
+  if (roomNumbersAmount < roomCapacityAmount) {
+    roomCapacity.setCustomValidity(`Максимум гостей ${roomNumbersAmount}`);
+  } else if (roomNumbersAmount === HUNDREAD_ROOMS && roomCapacityAmount !== NOT_FOR_GUEST) {
+    roomCapacity.setCustomValidity(`Не для гостей`);
+  } else if (roomNumbersAmount < HUNDREAD_ROOMS && roomCapacityAmount === NOT_FOR_GUEST) {
+    roomCapacity.setCustomValidity(`Поселите хоть кого-нибудь!`);
+  } else {
+    roomCapacity.setCustomValidity(``);
+  }
+  roomCapacity.reportValidity();
+};
+
+const onRoomSelectChange = () => {
+  roomNumberCapacityValidation();
+};
+
+roomNumber.addEventListener(`change`, onRoomSelectChange); // когда удалять обработчик?
+roomCapacity.addEventListener(`change`, onRoomSelectChange);
+roomNumberCapacityValidation();

@@ -7,18 +7,19 @@ const HOTELS_PHOTOS = [`http://o0.github.io/assets/images/tokyo/hotel1.jpg`, `ht
 const HOUSE_TYPES = [`palace`, `flat`, `house`, `bungalow`];
 const MAP_PIN_WIDTH = 50;
 const MAP_PIN_HEIGHT = 70;
+const MAIN_PIN_POINTER_HEIGHT = 22;
 const map = document.querySelector(`.map`);
 const mapPins = map.querySelector(`.map__pins`);
-const filtersContainer = map.querySelector(`.map__filters-container`);
+// const filtersContainer = map.querySelector(`.map__filters-container`);
 const pinTemplate = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
-const popupTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
+// const popupTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
 
-const houseTypes = {
-  palace: `Дворец`,
-  flat: `Квартира`,
-  house: `Дом`,
-  bungalow: `Бунгало`
-};
+// const HouseTypes = {
+//   palace: `Дворец`,
+//   flat: `Квартира`,
+//   house: `Дом`,
+//   bungalow: `Бунгало`
+// };
 
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
@@ -69,8 +70,6 @@ const createFeatures = () => {
 
 const pinFeatures = createFeatures();
 
-map.classList.remove(`map--faded`);
-
 const createPin = (featuresArray) => {
   let pinElement = pinTemplate.cloneNode(true);
   let img = pinElement.querySelector(`img`);
@@ -83,14 +82,8 @@ const createPin = (featuresArray) => {
   return pinElement;
 };
 
-const fragment = document.createDocumentFragment();
-
-for (let i = 0; i < pinFeatures.length; i++) {
-  fragment.appendChild(createPin(pinFeatures[i]));
-}
-
-mapPins.appendChild(fragment);
-
+// Создание и отрисовка карточки
+/*
 const createPopupFeature = (featuresArray) => {
   const element = document.createElement(`li`);
 
@@ -110,15 +103,15 @@ const createPopupPhoto = (src) => {
 
 const createPopup = (featuresArray) => {
   const popupElement = popupTemplate.cloneNode(true);
-  const popupDescription = popupElement.querySelector(`.popup__description`);
   const popupAvatar = popupElement.querySelector(`.popup__avatar`);
+  const popupDescription = popupElement.querySelector(`.popup__description`);
   const featuresList = popupElement.querySelector(`.popup__features`);
   const photoList = popupElement.querySelector(`.popup__photos`);
 
   popupElement.querySelector(`.popup__title`).textContent = featuresArray.offer.title;
   popupElement.querySelector(`.popup__text--address`).textContent = featuresArray.offer.address;
   popupElement.querySelector(`.popup__text--price`).innerHTML = featuresArray.offer.price + `&#x20bd;<span>/ночь</span>`;
-  popupElement.querySelector(`.popup__type`).textContent = houseTypes[featuresArray.offer.type];
+  popupElement.querySelector(`.popup__type`).textContent = HouseTypes[featuresArray.offer.type];
   popupElement.querySelector(`.popup__text--capacity`).textContent = featuresArray.offer.rooms + ` комнаты для ` + featuresArray.offer.guests + ` гостей`;
   popupElement.querySelector(`.popup__text--time`).textContent = `Заезд после ` + featuresArray.offer.checkin + `, выезд до ` + featuresArray.offer.checkout;
 
@@ -156,3 +149,95 @@ const createPopup = (featuresArray) => {
 };
 
 map.insertBefore(createPopup(pinFeatures[0]), filtersContainer);
+*/
+
+// Неактивное состояние формы обьявления
+const filterSelects = document.querySelector(`.map__filters`).children;
+const adForm = document.querySelector(`.ad-form`);
+const adFieldsets = adForm.querySelectorAll(`fieldset`);
+
+const toggleFormElementsState = (domElements, exist) => {
+  for (let element of domElements) {
+    element.disabled = exist;
+  }
+};
+
+toggleFormElementsState(adFieldsets, true);
+toggleFormElementsState(filterSelects, true);
+
+// Активное состояние страницы
+const mapMainPin = mapPins.querySelector(`.map__pin--main`);
+const MAIN_MOUSE_BUTTON = 0;
+
+const fragment = document.createDocumentFragment();
+
+const activateMap = () => {
+  toggleFormElementsState(adFieldsets, false);
+  toggleFormElementsState(filterSelects, false);
+
+  map.classList.remove(`map--faded`);
+
+  for (let i = 0; i < pinFeatures.length; i++) {
+    fragment.appendChild(createPin(pinFeatures[i]));
+  }
+
+  mapPins.appendChild(fragment);
+
+  inputAddress.value = mainPinX + `, ` + (mainPinY + mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT);
+  adForm.classList.remove(`ad-form--disabled`);
+};
+
+const onMainPinMouseClick = (evt) => {
+  if (evt.button === MAIN_MOUSE_BUTTON || evt.key === `Enter`) {
+    activateMap();
+
+    mapMainPin.removeEventListener(`mousedown`, onMainPinMouseClick);
+    mapMainPin.removeEventListener(`keydown`, onMainPinMouseClick);
+  }
+};
+
+mapMainPin.addEventListener(`mousedown`, onMainPinMouseClick);
+mapMainPin.addEventListener(`keydown`, onMainPinMouseClick);
+
+// Выбор адреса на карте. Вычисление координат метки
+const inputAddress = document.querySelector(`#address`);
+const mainPinX = parseInt(mapMainPin.style.left.slice(0, -2), 10) + mapMainPin.offsetWidth / 2;
+const mainPinY = parseInt(mapMainPin.style.top.slice(0, -2), 10) + mapMainPin.offsetHeight / 2;
+
+inputAddress.value = mainPinX + `, ` + mainPinY;
+
+// Валидация Количество комнат - Количество мест
+
+const roomNumber = adForm.querySelector(`#room_number`);
+const roomCapacity = adForm.querySelector(`#capacity`);
+const HUNDREAD_ROOMS = 100;
+const NOT_FOR_GUEST = 0;
+
+const roomNumberCapacityValidation = () => {
+
+  let roomNumbersAmount = parseInt(roomNumber.value, 10);
+  let roomCapacityAmount = parseInt(roomCapacity.value, 10);
+
+  if (roomNumbersAmount < roomCapacityAmount) {
+    roomCapacity.invalid = true;
+    roomCapacity.setCustomValidity(`Максимум гостей ${roomNumbersAmount}`);
+  } else if (roomNumbersAmount === HUNDREAD_ROOMS && roomCapacityAmount !== NOT_FOR_GUEST) {
+    roomCapacity.setCustomValidity(`Не для гостей`);
+    roomCapacity.invalid = true;
+  } else if (roomNumbersAmount < HUNDREAD_ROOMS && roomCapacityAmount === NOT_FOR_GUEST) {
+    roomCapacity.invalid = true;
+    roomCapacity.setCustomValidity(`Поселите хоть кого-нибудь!`);
+  } else {
+    roomCapacity.valid = true;
+    roomCapacity.setCustomValidity(``);
+  }
+  roomCapacity.reportValidity();
+};
+
+const onRoomSelectChange = () => {
+  roomNumberCapacityValidation();
+};
+
+roomNumber.addEventListener(`change`, onRoomSelectChange); // когда удалять обработчик?
+roomCapacity.addEventListener(`change`, onRoomSelectChange);
+roomNumberCapacityValidation();

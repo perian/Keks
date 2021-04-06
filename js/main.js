@@ -8,6 +8,8 @@ const HOUSE_TYPES = [`palace`, `flat`, `house`, `bungalow`];
 const MAP_PIN_WIDTH = 50;
 const MAP_PIN_HEIGHT = 70;
 const MAIN_PIN_POINTER_HEIGHT = 22;
+const HUNDREAD_ROOMS = 100;
+const NOT_FOR_GUEST = 0;
 const map = document.querySelector(`.map`);
 const mapPins = map.querySelector(`.map__pins`);
 // const filtersContainer = map.querySelector(`.map__filters-container`);
@@ -176,6 +178,7 @@ const activateMap = () => {
   toggleFormElementsState(filterSelects, false);
 
   map.classList.remove(`map--faded`);
+  setAddressField();
 
   for (let i = 0; i < pinFeatures.length; i++) {
     fragment.appendChild(createPin(pinFeatures[i]));
@@ -183,7 +186,6 @@ const activateMap = () => {
 
   mapPins.appendChild(fragment);
 
-  inputAddress.value = mainPinX + `, ` + (mainPinY + mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT);
   adForm.classList.remove(`ad-form--disabled`);
 };
 
@@ -201,20 +203,23 @@ mapMainPin.addEventListener(`keydown`, onMainPinMouseClick);
 
 // Выбор адреса на карте. Вычисление координат метки
 const inputAddress = document.querySelector(`#address`);
-const mainPinX = parseInt(mapMainPin.style.left.slice(0, -2), 10) + mapMainPin.offsetWidth / 2;
-const mainPinY = parseInt(mapMainPin.style.top.slice(0, -2), 10) + mapMainPin.offsetHeight / 2;
+const setAddressField = () => {
+  const mainPinX = parseInt(mapMainPin.style.left.slice(0, -2), 10) + mapMainPin.offsetWidth / 2;
+  const mainPinY = parseInt(mapMainPin.style.top.slice(0, -2), 10) + mapMainPin.offsetHeight / 2;
 
-inputAddress.value = mainPinX + `, ` + mainPinY;
+  inputAddress.value = mainPinX + `, ` + mainPinY;
+
+  if (!map.classList.contains(`map--faded`)) {
+    inputAddress.value = mainPinX + `, ` + (mainPinY + mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT);
+  }
+}
+setAddressField();
 
 // Валидация Количество комнат - Количество мест
-
 const roomNumber = adForm.querySelector(`#room_number`);
 const roomCapacity = adForm.querySelector(`#capacity`);
-const HUNDREAD_ROOMS = 100;
-const NOT_FOR_GUEST = 0;
 
-const roomNumberCapacityValidation = () => {
-
+const onRoomSelectChange = () => {
   let roomNumbersAmount = parseInt(roomNumber.value, 10);
   let roomCapacityAmount = parseInt(roomCapacity.value, 10);
 
@@ -234,10 +239,6 @@ const roomNumberCapacityValidation = () => {
   roomCapacity.reportValidity();
 };
 
-const onRoomSelectChange = () => {
-  roomNumberCapacityValidation();
-};
-
 roomNumber.addEventListener(`change`, onRoomSelectChange); // когда удалять обработчик?
-roomCapacity.addEventListener(`change`, onRoomSelectChange);
-roomNumberCapacityValidation();
+roomCapacity.addEventListener(`change`, onRoomSelectChange); // когда удалять обработчик?
+onRoomSelectChange();

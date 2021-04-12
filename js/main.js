@@ -72,7 +72,7 @@ const createFeatures = () => {
   return dataArray;
 };
 
-const pinFeatures = createFeatures()
+const pinFeatures = createFeatures();
 const createPin = (pin) => {
   const pinElement = pinTemplate.cloneNode(true);
   const img = pinElement.querySelector(`img`);
@@ -164,7 +164,7 @@ const closePopup = () => {
   map.querySelector(`.popup__close`).removeEventListener(`click`, closePopup);
   map.removeEventListener(`keydown`, closePopup);
   map.querySelector(`.map__card`).remove();
-}
+};
 
 const onPinClickShowAd = (evt) => {
   const adPopup = map.querySelector(`.map__card`);
@@ -174,7 +174,7 @@ const onPinClickShowAd = (evt) => {
   }
 
   map.insertBefore(createPopup(pinFeatures[evt.target.dataset.index]), filtersContainer);
-}
+};
 
 // Неактивное состояние формы обьявления
 const filterSelects = document.querySelector(`.map__filters`).children;
@@ -218,7 +218,7 @@ const onMainPinMouseClick = (evt) => {
 
     for (let i = 0; i <= pinFeatures.length; i++) {
       if (!allPins[i].classList.contains(`map__pin--main`)) {
-        allPins[i].addEventListener(`click`, onPinClickShowAd)
+        allPins[i].addEventListener(`click`, onPinClickShowAd);
       }
     }
 
@@ -240,7 +240,7 @@ const setAddressField = () => {
     mainPinY += mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT;
   }
   inputAddress.value = mainPinX + `, ` + mainPinY;
-}
+};
 setAddressField();
 
 // Валидация Количество комнат - Количество мест

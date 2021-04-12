@@ -12,16 +12,17 @@ const HUNDREAD_ROOMS = 100;
 const NOT_FOR_GUEST = 0;
 const map = document.querySelector(`.map`);
 const mapPins = map.querySelector(`.map__pins`);
-// const filtersContainer = map.querySelector(`.map__filters-container`);
+const filtersContainer = map.querySelector(`.map__filters-container`);
 const pinTemplate = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
-// const popupTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
+const popupTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
+const fragment = document.createDocumentFragment();
 
-// const HouseTypes = {
-//   palace: `Дворец`,
-//   flat: `Квартира`,
-//   house: `Дом`,
-//   bungalow: `Бунгало`
-// };
+const HouseTypes = {
+  palace: `Дворец`,
+  flat: `Квартира`,
+  house: `Дом`,
+  bungalow: `Бунгало`
+};
 
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
@@ -40,10 +41,10 @@ const getRandomArrayLength = (array) => {
 
 const createFeatures = () => {
   const dataArray = [];
-  for (let i = 1; i <= OBJECTS_AMOUNT; i++) {
+  for (let i = 0; i < OBJECTS_AMOUNT; i++) {
     let dataTemplate = {
       author: {
-        avatar: `img/avatars/user0${i}.png`
+        avatar: `img/avatars/user0` + (i + 1) + `.png`
       },
       offer: {
         title: `Заголовок предложения`,
@@ -61,7 +62,8 @@ const createFeatures = () => {
       location: {
         x: getRandomInt(130, 1200),
         y: getRandomInt(130, 640)
-      }
+      },
+      index: i
     };
 
     dataArray.push(dataTemplate);
@@ -70,22 +72,21 @@ const createFeatures = () => {
   return dataArray;
 };
 
-const pinFeatures = createFeatures();
+const pinFeatures = createFeatures()
+const createPin = (pin) => {
+  const pinElement = pinTemplate.cloneNode(true);
+  const img = pinElement.querySelector(`img`);
 
-const createPin = (featuresArray) => {
-  let pinElement = pinTemplate.cloneNode(true);
-  let img = pinElement.querySelector(`img`);
-
-  pinElement.style.left = featuresArray.location.x + MAP_PIN_WIDTH / 2 + `px`;
-  pinElement.style.top = featuresArray.location.y + MAP_PIN_HEIGHT + `px`;
-  img.src = featuresArray.author.avatar;
-  img.alt = featuresArray.offer.description;
+  pinElement.style.left = pin.location.x + MAP_PIN_WIDTH / 2 + `px`;
+  pinElement.style.top = pin.location.y + MAP_PIN_HEIGHT + `px`;
+  img.src = pin.author.avatar;
+  img.alt = pin.offer.description;
+  img.dataset.index = pin.index;
 
   return pinElement;
 };
 
 // Создание и отрисовка карточки
-/*
 const createPopupFeature = (featuresArray) => {
   const element = document.createElement(`li`);
 
@@ -105,6 +106,7 @@ const createPopupPhoto = (src) => {
 
 const createPopup = (featuresArray) => {
   const popupElement = popupTemplate.cloneNode(true);
+
   const popupAvatar = popupElement.querySelector(`.popup__avatar`);
   const popupDescription = popupElement.querySelector(`.popup__description`);
   const featuresList = popupElement.querySelector(`.popup__features`);
@@ -147,11 +149,32 @@ const createPopup = (featuresArray) => {
     photoList.remove();
   }
 
+  const popupClose = popupElement.querySelector(`.popup__close`);
+  popupClose.addEventListener(`click`, closePopup);
+  map.addEventListener(`keydown`, function (evt) {
+    if (evt.key === `Escape`) {
+      closePopup();
+    }
+  });
+
   return popupElement;
 };
 
-map.insertBefore(createPopup(pinFeatures[0]), filtersContainer);
-*/
+const closePopup = () => {
+  map.querySelector(`.popup__close`).removeEventListener(`click`, closePopup);
+  map.removeEventListener(`keydown`, closePopup);
+  map.querySelector(`.map__card`).remove();
+}
+
+const onPinClickShowAd = (evt) => {
+  const adPopup = map.querySelector(`.map__card`);
+
+  if (adPopup) {
+    closePopup();
+  }
+
+  map.insertBefore(createPopup(pinFeatures[evt.target.dataset.index]), filtersContainer);
+}
 
 // Неактивное состояние формы обьявления
 const filterSelects = document.querySelector(`.map__filters`).children;
@@ -170,8 +193,6 @@ toggleFormElementsState(filterSelects, true);
 // Активное состояние страницы
 const mapMainPin = mapPins.querySelector(`.map__pin--main`);
 const MAIN_MOUSE_BUTTON = 0;
-
-const fragment = document.createDocumentFragment();
 
 const activateMap = () => {
   toggleFormElementsState(adFieldsets, false);
@@ -193,6 +214,14 @@ const onMainPinMouseClick = (evt) => {
   if (evt.button === MAIN_MOUSE_BUTTON || evt.key === `Enter`) {
     activateMap();
 
+    const allPins = mapPins.querySelectorAll(`.map__pin`);
+
+    for (let i = 0; i <= pinFeatures.length; i++) {
+      if (!allPins[i].classList.contains(`map__pin--main`)) {
+        allPins[i].addEventListener(`click`, onPinClickShowAd)
+      }
+    }
+
     mapMainPin.removeEventListener(`mousedown`, onMainPinMouseClick);
     mapMainPin.removeEventListener(`keydown`, onMainPinMouseClick);
   }
@@ -202,16 +231,15 @@ mapMainPin.addEventListener(`mousedown`, onMainPinMouseClick);
 mapMainPin.addEventListener(`keydown`, onMainPinMouseClick);
 
 // Выбор адреса на карте. Вычисление координат метки
-const inputAddress = document.querySelector(`#address`);
 const setAddressField = () => {
-  const mainPinX = parseInt(mapMainPin.style.left.slice(0, -2), 10) + mapMainPin.offsetWidth / 2;
-  const mainPinY = parseInt(mapMainPin.style.top.slice(0, -2), 10) + mapMainPin.offsetHeight / 2;
-
-  inputAddress.value = mainPinX + `, ` + mainPinY;
+  const inputAddress = document.querySelector(`#address`);
+  let mainPinX = parseInt(mapMainPin.style.left.slice(0, -2), 10) + mapMainPin.offsetWidth / 2;
+  let mainPinY = parseInt(mapMainPin.style.top.slice(0, -2), 10) + mapMainPin.offsetHeight / 2;
 
   if (!map.classList.contains(`map--faded`)) {
-    inputAddress.value = mainPinX + `, ` + (mainPinY + mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT);
+    mainPinY += mapMainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT;
   }
+  inputAddress.value = mainPinX + `, ` + mainPinY;
 }
 setAddressField();
 

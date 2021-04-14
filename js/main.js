@@ -82,6 +82,7 @@ const createPin = (pin) => {
   img.src = pin.author.avatar;
   img.alt = pin.offer.description;
   img.dataset.index = pin.index;
+  pinElement.dataset.index = pin.index;
 
   return pinElement;
 };
@@ -150,9 +151,16 @@ const createPopup = (featuresArray) => {
   }
 
   const popupClose = popupElement.querySelector(`.popup__close`);
-  popupClose.addEventListener(`click`, closePopup);
-  map.addEventListener(`keydown`, function (evt) {
+  map.addEventListener(`click`, (evt) => {
+    if (evt.target.matches(`.popup__close`)) {
+      closePopup();
+    }
+  });
+
+  mapPins.addEventListener(`keydown`, function (evt) {
     if (evt.key === `Escape`) {
+      evt.preventDefault();
+      console.log(evt.target.closest(`div`));
       closePopup();
     }
   });
@@ -163,17 +171,21 @@ const createPopup = (featuresArray) => {
 const closePopup = () => {
   map.querySelector(`.popup__close`).removeEventListener(`click`, closePopup);
   map.removeEventListener(`keydown`, closePopup);
-  map.querySelector(`.map__card`).remove();
+
+  map.querySelector(`.map__card`, `popup`).remove();
 };
 
-const onPinClickShowAd = (evt) => {
-  const adPopup = map.querySelector(`.map__card`);
-
-  if (adPopup) {
+const onPinClickShowPopup = (evt) => {
+  if (map.querySelector(`.map__card`)) {
     closePopup();
   }
 
-  map.insertBefore(createPopup(pinFeatures[evt.target.dataset.index]), filtersContainer);
+  showPopup(evt.target.dataset.index);
+};
+
+// Создаем и добавляем карточку обьявления на основе элемента из массива обьявлений
+const showPopup = (popupIndex) => {
+  map.insertBefore(createPopup(pinFeatures[popupIndex]), filtersContainer);
 };
 
 // Неактивное состояние формы обьявления
@@ -218,7 +230,7 @@ const onMainPinMouseClick = (evt) => {
 
     for (let i = 0; i <= pinFeatures.length; i++) {
       if (!allPins[i].classList.contains(`map__pin--main`)) {
-        allPins[i].addEventListener(`click`, onPinClickShowAd);
+        allPins[i].addEventListener(`click`, onPinClickShowPopup);
       }
     }
 

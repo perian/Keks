@@ -150,32 +150,27 @@ const createPopup = (featuresArray) => {
     photoList.remove();
   }
 
-  const popupClose = popupElement.querySelector(`.popup__close`);
-  map.addEventListener(`click`, (evt) => {
-    if (evt.target.matches(`.popup__close`)) {
-      closePopup();
-    }
-  });
-
-  mapPins.addEventListener(`keydown`, function (evt) {
-    if (evt.key === `Escape`) {
-      evt.preventDefault();
-      console.log(evt.target.closest(`div`));
-      closePopup();
-    }
-  });
-
   return popupElement;
 };
 
-const closePopup = () => {
-  map.querySelector(`.popup__close`).removeEventListener(`click`, closePopup);
-  map.removeEventListener(`keydown`, closePopup);
+map.addEventListener(`click`, (evt) => {
+  if (evt.target.matches(`.popup__close`)) {
+    closePopup();
+  }
+});
 
+document.addEventListener(`keydown`, (evt) => {
+  if (evt.key === `Escape`) {
+    evt.preventDefault();
+    closePopup();
+  }
+});
+
+const closePopup = () => {
   map.querySelector(`.map__card`, `popup`).remove();
 };
 
-const onPinClickShowPopup = (evt) => {
+const openPopup = (evt) => {
   if (map.querySelector(`.map__card`)) {
     closePopup();
   }
@@ -230,7 +225,7 @@ const onMainPinMouseClick = (evt) => {
 
     for (let i = 0; i <= pinFeatures.length; i++) {
       if (!allPins[i].classList.contains(`map__pin--main`)) {
-        allPins[i].addEventListener(`click`, onPinClickShowPopup);
+        allPins[i].addEventListener(`click`, openPopup);
       }
     }
 

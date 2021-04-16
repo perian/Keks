@@ -18,10 +18,22 @@ const popupTemplate = document.querySelector(`#card`).content.querySelector(`.po
 const fragment = document.createDocumentFragment();
 
 const HouseTypes = {
-  palace: `Дворец`,
-  flat: `Квартира`,
-  house: `Дом`,
-  bungalow: `Бунгало`
+  bungalow: {
+    name: `Бунгало`,
+    minPrice: 0
+  },
+  flat: {
+    name: `Квартира`,
+    minPrice: 1000
+  },
+  house: {
+    name: `Дом`,
+    minPrice: 5000
+  },
+  palace: {
+    name: `Дворец`,
+    minPrice: 10000
+  }
 };
 
 const getRandomInt = (min, max) => {
@@ -63,7 +75,7 @@ const createFeatures = () => {
         x: getRandomInt(130, 1200),
         y: getRandomInt(130, 640)
       },
-      index: i
+      id: i
     };
 
     dataArray.push(dataTemplate);
@@ -81,8 +93,8 @@ const createPin = (pin) => {
   pinElement.style.top = pin.location.y + MAP_PIN_HEIGHT + `px`;
   img.src = pin.author.avatar;
   img.alt = pin.offer.description;
-  img.dataset.index = pin.index;
-  pinElement.dataset.index = pin.index;
+  img.dataset.id = pin.id;
+  pinElement.dataset.id = pin.id;
 
   return pinElement;
 };
@@ -116,7 +128,7 @@ const createPopup = (featuresArray) => {
   popupElement.querySelector(`.popup__title`).textContent = featuresArray.offer.title;
   popupElement.querySelector(`.popup__text--address`).textContent = featuresArray.offer.address;
   popupElement.querySelector(`.popup__text--price`).innerHTML = featuresArray.offer.price + `&#x20bd;<span>/ночь</span>`;
-  popupElement.querySelector(`.popup__type`).textContent = HouseTypes[featuresArray.offer.type];
+  popupElement.querySelector(`.popup__type`).textContent = HouseTypes[featuresArray.offer.type].name;
   popupElement.querySelector(`.popup__text--capacity`).textContent = featuresArray.offer.rooms + ` комнаты для ` + featuresArray.offer.guests + ` гостей`;
   popupElement.querySelector(`.popup__text--time`).textContent = `Заезд после ` + featuresArray.offer.checkin + `, выезд до ` + featuresArray.offer.checkout;
 
@@ -167,7 +179,7 @@ document.addEventListener(`keydown`, (evt) => {
 });
 
 const closePopup = () => {
-  map.querySelector(`.map__card`, `popup`).remove();
+  map.querySelector(`.map__card`).remove();
 };
 
 const openPopup = (evt) => {
@@ -175,12 +187,12 @@ const openPopup = (evt) => {
     closePopup();
   }
 
-  showPopup(evt.target.dataset.index);
+  showPopup(evt.target.dataset.id);
 };
 
 // Создаем и добавляем карточку обьявления на основе элемента из массива обьявлений
-const showPopup = (popupIndex) => {
-  map.insertBefore(createPopup(pinFeatures[popupIndex]), filtersContainer);
+const showPopup = (popupid) => {
+  map.insertBefore(createPopup(pinFeatures[popupid]), filtersContainer);
 };
 
 // Неактивное состояние формы обьявления
@@ -277,3 +289,22 @@ const onRoomSelectChange = () => {
 roomNumber.addEventListener(`change`, onRoomSelectChange); // когда удалять обработчик?
 roomCapacity.addEventListener(`change`, onRoomSelectChange); // когда удалять обработчик?
 onRoomSelectChange();
+
+// Валидация. Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»
+const houseType = adForm.querySelector(`#type`);
+const housePrice = adForm.querySelector(`#price`);
+
+const setHouseMinPrice = () => {
+  const houseTypeValue = houseType.value;
+  housePrice.setAttribute(`min`, HouseTypes[houseTypeValue].minPrice);
+  housePrice.setAttribute(`placeholder`, HouseTypes[houseTypeValue].minPrice);
+}
+setHouseMinPrice();
+
+const onHouseSelectChange = () => {
+  setHouseMinPrice();
+  housePrice.reportValidity();
+};
+
+houseType.addEventListener(`change`, onHouseSelectChange);
+

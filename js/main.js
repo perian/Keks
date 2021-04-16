@@ -10,6 +10,7 @@ const MAP_PIN_HEIGHT = 70;
 const MAIN_PIN_POINTER_HEIGHT = 22;
 const HUNDREAD_ROOMS = 100;
 const NOT_FOR_GUEST = 0;
+const MAX_HOUSE_PRICE = 1000000;
 const map = document.querySelector(`.map`);
 const mapPins = map.querySelector(`.map__pins`);
 const filtersContainer = map.querySelector(`.map__filters-container`);
@@ -293,18 +294,33 @@ onRoomSelectChange();
 // Валидация. Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»
 const houseType = adForm.querySelector(`#type`);
 const housePrice = adForm.querySelector(`#price`);
-
 const setHouseMinPrice = () => {
-  const houseTypeValue = houseType.value;
-  housePrice.setAttribute(`min`, HouseTypes[houseTypeValue].minPrice);
-  housePrice.setAttribute(`placeholder`, HouseTypes[houseTypeValue].minPrice);
+  const minPrice = HouseTypes[houseType.value].minPrice;
+
+  housePrice.setAttribute(`min`, minPrice);
+  housePrice.setAttribute(`placeholder`, minPrice);
 }
 setHouseMinPrice();
 
 const onHouseSelectChange = () => {
   setHouseMinPrice();
+
+  const housePriceValue = parseInt(housePrice.value, 10);
+  const minPrice = HouseTypes[houseType.value].minPrice;
+
+  if (housePriceValue < minPrice) {
+    housePrice.invalid = true;
+    housePrice.setCustomValidity(`Значение должно быть больше или ровно ` + `${minPrice}`);
+  } else if (housePriceValue > MAX_HOUSE_PRICE) {
+    housePrice.invalid = true;
+    housePrice.setCustomValidity(`Значение должно быть меньше или ровно ` + MAX_HOUSE_PRICE);
+  } else {
+    housePrice.valid = true;
+    housePrice.setCustomValidity(``);
+  }
   housePrice.reportValidity();
 };
 
 houseType.addEventListener(`change`, onHouseSelectChange);
+housePrice.addEventListener(`input`, onHouseSelectChange);
 

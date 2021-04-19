@@ -9,7 +9,7 @@ const MAP_PIN_WIDTH = 50;
 const MAP_PIN_HEIGHT = 70;
 const MAIN_PIN_POINTER_HEIGHT = 22;
 const HUNDREAD_ROOMS = 100;
-const NOT_FOR_GUEST = 0;
+const NOT_FOR_GUESTS = 0;
 const MAX_HOUSE_PRICE = 1000000;
 const map = document.querySelector(`.map`);
 const mapPins = map.querySelector(`.map__pins`);
@@ -274,10 +274,10 @@ const onRoomSelectChange = () => {
   if (roomNumbersAmount < roomCapacityAmount) {
     roomCapacity.invalid = true;
     roomCapacity.setCustomValidity(`Максимум гостей ${roomNumbersAmount}`);
-  } else if (roomNumbersAmount === HUNDREAD_ROOMS && roomCapacityAmount !== NOT_FOR_GUEST) {
+  } else if (roomNumbersAmount === HUNDREAD_ROOMS && roomCapacityAmount !== NOT_FOR_GUESTS) {
     roomCapacity.setCustomValidity(`Не для гостей`);
     roomCapacity.invalid = true;
-  } else if (roomNumbersAmount < HUNDREAD_ROOMS && roomCapacityAmount === NOT_FOR_GUEST) {
+  } else if (roomNumbersAmount < HUNDREAD_ROOMS && roomCapacityAmount === NOT_FOR_GUESTS) {
     roomCapacity.invalid = true;
     roomCapacity.setCustomValidity(`Поселите хоть кого-нибудь!`);
   } else {
@@ -324,3 +324,14 @@ const onHouseSelectChange = () => {
 houseType.addEventListener(`change`, onHouseSelectChange);
 housePrice.addEventListener(`input`, onHouseSelectChange);
 
+// Валидация. Поля «Время заезда» и «Время выезда» синхронизированы
+const moveInTime = adForm.querySelector(`#timein`);
+const moveOutTime = adForm.querySelector(`#timeout`);
+
+moveInTime.addEventListener(`change`, () => {
+  moveOutTime.value = moveInTime.value;
+});
+
+moveOutTime.addEventListener(`change`, () => {
+  moveInTime.value = moveOutTime.value;
+});

@@ -156,19 +156,6 @@ const createCard = (card) => {
 
 
 // Создаем и добавляем карточку обьявления на основе элемента из массива обьявлений
-// Создаем и добавляем карточку обьявления на основе элемента из массива обьявлений
-// const onEscClose = (evt) => {
-//   if (evt.key === `Escape`) {
-//     closePopup();
-//   }
-// };
-
-// const closeCard = () => {
-//   map.querySelector(`.map__card`).remove();
-
-//   document.removeEventListener(`keydown`, onEscClose);
-// };
-
 const onClickCloseCard = (evt) => {
   if (evt.target.matches(`.popup__close`)) {
     closeCard();

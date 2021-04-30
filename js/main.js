@@ -156,33 +156,53 @@ const createCard = (card) => {
 
 
 // Создаем и добавляем карточку обьявления на основе элемента из массива обьявлений
+// Создаем и добавляем карточку обьявления на основе элемента из массива обьявлений
+// const onEscClose = (evt) => {
+//   if (evt.key === `Escape`) {
+//     closePopup();
+//   }
+// };
+
+// const closeCard = () => {
+//   map.querySelector(`.map__card`).remove();
+
+//   document.removeEventListener(`keydown`, onEscClose);
+// };
+
+const onClickCloseCard = (evt) => {
+  if (evt.target.matches(`.popup__close`)) {
+    closeCard();
+  }
+};
+
+const onKeydownCloseCard = (evt) => {
+  const isCard = map.contains(map.querySelector(`.map__card`));
+
+  if (evt.key === `Escape` && isCard) {
+    evt.preventDefault();
+    closeCard();
+  }
+};
 
 const closeCard = () => {
   map.querySelector(`.map__card`).remove();
+
+  map.removeEventListener(`click`, onClickCloseCard);
+  document.removeEventListener(`keydown`, onKeydownCloseCard);
 };
 
 const openCard = (cardId) => {
-  if (map.querySelector(`.map__card`)) {
+  const isCard = map.contains(map.querySelector(`.map__card`));
+  if (isCard) {
     closeCard();
   }
 
   map.insertBefore(createCard(pinFeatures[cardId]), filtersContainer);
+
+  const card = map.querySelector(`.map__card`);
+  card.addEventListener(`click`, onClickCloseCard);
+  document.addEventListener(`keydown`, onKeydownCloseCard);
 };
-
-map.addEventListener(`click`, (evt) => {
-  if (evt.target.matches(`.popup__close`)) {
-    closeCard();
-  }
-});
-
-document.addEventListener(`keydown`, (evt) => {
-  const mapCard = map.querySelector(`.map__card`);
-
-  if (evt.key === `Escape` && map.contains(mapCard)) {
-    evt.preventDefault();
-    closeCard();
-  }
-});
 
 mapPins.addEventListener(`click`, (evt) => {
   const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
@@ -193,7 +213,7 @@ mapPins.addEventListener(`click`, (evt) => {
 });
 
 mapPins.addEventListener(`keydown`, (evt) => {
-  if (evt.key === `Enter`) {
+  if (evt.key === `Enter` && evt.target.matches(`.map__pin`) && !(evt.target.matches(`.map__pin--main`))) {
     openCard(evt);
   }
 });

@@ -22,5 +22,5 @@
         element.disabled = exist;
       }
     }
-  }
+  };
 })();

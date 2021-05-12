@@ -20,8 +20,8 @@
     if (!map.classList.contains(`map--faded`)) {
       mainPinY += mainPinHalfHeight + MAIN_PIN_POINTER_HEIGHT;
     }
-    window.form.setAddressField(mainPinX, mainPinY)
-  }
+    window.form.setAddressField(mainPinX, mainPinY);
+  };
   updateAddressField(mainPinX, mainPinY);
 
   // Неактивное состояние страницы
@@ -44,5 +44,5 @@
   window.map = {
     activate,
     mainPin
-  }
+  };
 })();

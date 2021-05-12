@@ -5,12 +5,12 @@
   let isPageActive = false;
 
   const activatePage = () => {
-    if(!isPageActive) {
+    if (!isPageActive) {
       isPageActive = true;
       window.form.activate();
       window.map.activate();
     }
-  }
+  };
 
   const onMainPinClick = (evt) => {
     if (evt.button === MAIN_CLICK) {

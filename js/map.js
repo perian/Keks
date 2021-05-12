@@ -1,65 +1,48 @@
 "use strict";
 
 (function () {
-  const MAIN_MOUSE_BUTTON = 0;
   const MAIN_PIN_POINTER_HEIGHT = 22;
   const map = document.querySelector(`.map`);
-  const mapPins = map.querySelector(`.map__pins`);
-  const mapMainPin = mapPins.querySelector(`.map__pin--main`);
+  const pins = map.querySelector(`.map__pins`);
   const filterSelects = document.querySelector(`.map__filters`).children;
-  const adForm = document.querySelector(`.ad-form`);
-  const adFieldsets = adForm.querySelectorAll(`fieldset`);
-  const mainPin = mapPins.querySelector(`.map__pin--main`);
+  const mainPin = pins.querySelector(`.map__pin--main`);
+  const fragment = document.createDocumentFragment();
   let mainPinX = mainPin.style.left;
   let mainPinY = mainPin.style.top;
-  const fragment = document.createDocumentFragment();
 
-  const updateAddressField = () => {
-    mainPinX = parseInt(mainPin.style.left.slice(0, -2), 10) + mainPin.offsetWidth / 2;
-    mainPinY = parseInt(mainPin.style.top.slice(0, -2), 10) + mainPin.offsetHeight / 2;
+  const updateAddressField = (x, y) => {
+    const mainPinHalfHeight = mainPin.offsetHeight / 2;
+    const mainPinHalfWidth = mainPin.offsetWidth / 2;
+
+    mainPinX = window.utils.transformToInteger(x) + mainPinHalfWidth;
+    mainPinY = window.utils.transformToInteger(y) + mainPinHalfHeight;
 
     if (!map.classList.contains(`map--faded`)) {
-      mainPinY += mainPin.offsetHeight / 2 + MAIN_PIN_POINTER_HEIGHT;
+      mainPinY += mainPinHalfHeight + MAIN_PIN_POINTER_HEIGHT;
     }
-    window.setAddressField(mainPinX, mainPinY)
+    window.form.setAddressField(mainPinX, mainPinY)
   }
-  updateAddressField();
+  updateAddressField(mainPinX, mainPinY);
 
-  // Неактивное состояние формы обьявления
-  const toggleFormElementsState = (domElements, exist) => {
-    for (let element of domElements) {
-      element.disabled = exist;
-    }
-  };
-  toggleFormElementsState(adFieldsets, true);
-  toggleFormElementsState(filterSelects, true);
+  // Неактивное состояние страницы
+  window.utils.toggleFormElementsState(filterSelects, true);
 
   // Активное состояние страницы
   const activate = () => {
-    toggleFormElementsState(adFieldsets, false);
-    toggleFormElementsState(filterSelects, false);
+    window.utils.toggleFormElementsState(filterSelects, false);
 
     map.classList.remove(`map--faded`);
-    updateAddressField();
+    updateAddressField(mainPin.style.left, mainPin.style.top);
 
     for (let i = 0; i < window.data.pinFeatures.length; i++) {
       fragment.appendChild(window.createPin(window.data.pinFeatures[i]));
     }
 
-    mapPins.appendChild(fragment);
-
-    adForm.classList.remove(`ad-form--disabled`);
+    pins.appendChild(fragment);
   };
 
-  mapMainPin.addEventListener(`mousedown`, (evt) => {
-    if (evt.button === MAIN_MOUSE_BUTTON) {
-      activate();
-    }
-  });
-
-  mapMainPin.addEventListener(`keydown`, (evt) => {
-    if (evt.key === `Enter`) {
-      activate();
-    }
-  });
+  window.map = {
+    activate,
+    mainPin
+  }
 })();

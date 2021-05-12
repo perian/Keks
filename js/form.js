@@ -6,10 +6,21 @@
   const MAX_HOUSE_PRICE = 1000000;
   const adForm = document.querySelector(`.ad-form`);
   const inputAddress = document.querySelector(`#address`);
+  const adFieldsets = adForm.querySelectorAll(`fieldset`);
 
   // Выбор адреса на карте. Вычисление координат метки
   const setAddressField = (x, y) => {
     inputAddress.value = x + `, ` + y;
+  };
+
+  // Неактивное состояние страницы
+  window.utils.toggleFormElementsState(adFieldsets, true);
+
+  // Активное состояние страницы
+  const activate = () => {
+    window.utils.toggleFormElementsState(adFieldsets, false);
+
+    adForm.classList.remove(`ad-form--disabled`);
   };
 
   // Валидация Количество комнат - Количество мест
@@ -87,5 +98,8 @@
     moveInTime.value = moveOutTime.value;
   });
 
-  window.setAddressField = setAddressField;
+  window.form = {
+    setAddressField,
+    activate
+  };
 })();

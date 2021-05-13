@@ -42,6 +42,7 @@
   };
 
   window.map = {
+    updateAddressField,
     element: map,
     activate,
     mainPin,

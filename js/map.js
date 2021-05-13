@@ -42,7 +42,9 @@
   };
 
   window.map = {
+    element: map,
     activate,
-    mainPin
+    mainPin,
+    pins
   };
 })();

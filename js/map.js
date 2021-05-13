@@ -42,7 +42,10 @@
   };
 
   window.map = {
+    updateAddressField,
+    element: map,
     activate,
-    mainPin
+    mainPin,
+    pins
   };
 })();

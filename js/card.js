@@ -54,41 +54,39 @@
   };
 
   // Создаем и добавляем на страницу карточку обьявления на основе элемента из массива обьявлений
-  const map = document.querySelector(`.map`);
-  const mapPins = map.querySelector(`.map__pins`);
-  const filtersContainer = map.querySelector(`.map__filters-container`);
+  const filtersContainer = window.map.element.querySelector(`.map__filters-container`);
 
   const closeCard = () => {
-    map.querySelector(`.map__card`).remove();
+    window.map.element.querySelector(`.map__card`).remove();
   };
 
   const openCard = (cardId) => {
-    if (map.querySelector(`.map__card`)) {
+    if (window.map.element.querySelector(`.map__card`)) {
       closeCard();
     }
 
     const targetOffer = window.data.pinFeatures[cardId];
     const card = createCard(targetOffer);
 
-    map.insertBefore(card, filtersContainer);
+    window.map.element.insertBefore(card, filtersContainer);
   };
 
-  map.addEventListener(`click`, (evt) => {
+  window.map.element.addEventListener(`click`, (evt) => {
     if (evt.target.matches(`.popup__close`)) {
       closeCard();
     }
   });
 
   document.addEventListener(`keydown`, (evt) => {
-    const mapCard = map.querySelector(`.map__card`);
+    const mapCard = window.map.element.querySelector(`.map__card`);
 
-    if (evt.key === `Escape` && map.contains(mapCard)) {
+    if (evt.key === `Escape` && window.map.element.contains(mapCard)) {
       evt.preventDefault();
       closeCard();
     }
   });
 
-  mapPins.addEventListener(`click`, (evt) => {
+  window.map.pins.addEventListener(`click`, (evt) => {
     const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
     if (target) {
       const cardId = target.dataset.id;
@@ -96,7 +94,7 @@
     }
   });
 
-  mapPins.addEventListener(`keydown`, (evt) => {
+  window.map.pins.addEventListener(`keydown`, (evt) => {
     if (evt.key === `Enter`) {
       openCard(evt);
     }

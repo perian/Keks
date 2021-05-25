@@ -47,10 +47,8 @@
     roomCapacity.reportValidity();
   };
 
-  roomNumber.addEventListener(`change`, onRoomSelectChange); // когда удалять обработчик?
-  roomCapacity.addEventListener(`change`, () => {
-    onRoomSelectChange(0);
-  }); // когда удалять обработчик?
+  roomNumber.addEventListener(`change`, onRoomSelectChange);
+  roomCapacity.addEventListener(`change`, onRoomSelectChange);
   onRoomSelectChange();
 
   // Валидация. Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»

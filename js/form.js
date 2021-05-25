@@ -1,9 +1,12 @@
 "use strict";
 
 (function () {
+  const URL_UPLOAD = `https://21.javascript.pages.academy/keksobooking/`;
   const HUNDREAD_ROOMS = 100;
   const NOT_FOR_GUESTS = 0;
   const MAX_HOUSE_PRICE = 1000000;
+  const MAIN_PIN_X = `570px`;
+  const MAIN_PIN_Y = `375px`;
   const adForm = document.querySelector(`.ad-form`);
   const inputAddress = document.querySelector(`#address`);
   const adFieldsets = adForm.querySelectorAll(`fieldset`);
@@ -13,14 +16,24 @@
     inputAddress.value = x + `, ` + y;
   };
 
-  // Неактивное состояние страницы
+  // Изначальное состояние страницы
   window.utils.toggleFormElementsState(adFieldsets, true);
 
-  // Активное состояние страницы
-  const activate = () => {
-    window.utils.toggleFormElementsState(adFieldsets, false);
+  // Активное/неактивное состояние страницы
+  const isActive = (boolean) => {
+    if(boolean) {
+      window.utils.toggleFormElementsState(adFieldsets, false);
 
-    adForm.classList.remove(`ad-form--disabled`);
+      adForm.classList.remove(`ad-form--disabled`);
+    } else {
+      window.utils.toggleFormElementsState(adFieldsets, true);
+      adForm.classList.add(`ad-form--disabled`);
+
+      const renderedPins = window.map.pins.querySelectorAll(`.map__pin:not(.map__pin--main)`);
+      for (let i = 0; i < renderedPins.length; i++) {
+        window.map.pins.querySelector(`.map__pin:not(.map__pin--main)`).remove();
+      }
+    }
   };
 
   // Валидация Количество комнат - Количество мест
@@ -47,10 +60,8 @@
     roomCapacity.reportValidity();
   };
 
-  roomNumber.addEventListener(`change`, onRoomSelectChange); // когда удалять обработчик?
-  roomCapacity.addEventListener(`change`, () => {
-    onRoomSelectChange(0);
-  }); // когда удалять обработчик?
+  roomNumber.addEventListener(`change`, onRoomSelectChange);
+  roomCapacity.addEventListener(`change`, onRoomSelectChange);
   onRoomSelectChange();
 
   // Валидация. Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»
@@ -98,8 +109,44 @@
     moveInTime.value = moveOutTime.value;
   });
 
+  // Отправка данных на сервер
+  const onSuccess = (status) => {
+    const success = document.querySelector(`#success`).content.querySelector(`.success`);
+    const successBlock = success.cloneNode(true);
+
+    console.log(status);
+  };
+
+  const onError = (errorMessage) => {
+    console.log(errorMessage);
+  };
+
+  adForm.addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+
+    const formData = new FormData(adForm);
+    window.load(`POST`, URL_UPLOAD, onSuccess, onError, formData);
+
+    // Изначальное состояние страницы
+    window.main.activatePage(false);
+
+    const renderedCard = window.map.element.querySelector(`.map__card`);
+    if (renderedCard) {
+      renderedCard.remove();
+    }
+
+    adForm.reset();
+
+    window.map.mainPin.style.left = MAIN_PIN_X;
+    window.map.mainPin.style.top = MAIN_PIN_Y;
+    window.map.updateAddressField(MAIN_PIN_X, MAIN_PIN_Y);
+
+    window.map.mainPin.addEventListener(`mousedown`, window.main.onMainPinClick);
+    window.map.mainPin.addEventListener(`keydown`, window.main.onMainPinEnter);
+  });
+
   window.form = {
     setAddressField,
-    activate
+    isActive
   };
 })();

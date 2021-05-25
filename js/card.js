@@ -56,8 +56,16 @@
   // Создаем и добавляем на страницу карточку обьявления на основе элемента из массива обьявлений
   const filtersContainer = window.map.element.querySelector(`.map__filters-container`);
 
+  const deactivatePin = () => {
+    const activePin = window.map.element.querySelector(`.map__pin--active`);
+    if (activePin) {
+      activePin.classList.remove(`map__pin--active`);
+    }
+  };
+
   const closeCard = () => {
     window.map.element.querySelector(`.map__card`).remove();
+    deactivatePin();
   };
 
   const openCard = (cardId) => {
@@ -65,7 +73,7 @@
       closeCard();
     }
 
-    const targetOffer = window.data.pinFeatures[cardId];
+    const targetOffer = window.data.ads[cardId];
     const card = createCard(targetOffer);
 
     window.map.element.insertBefore(card, filtersContainer);
@@ -89,6 +97,9 @@
   window.map.pins.addEventListener(`click`, (evt) => {
     const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
     if (target) {
+      deactivatePin();
+      target.classList.add(`map__pin--active`);
+
       const cardId = target.dataset.id;
       openCard(cardId);
     }

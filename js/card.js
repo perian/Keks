@@ -61,11 +61,16 @@
     if (activePin) {
       activePin.classList.remove(`map__pin--active`);
     }
+  }
+
+  const activatePin = (target) => {
+    deactivatePin();
+
+    target.classList.add(`map__pin--active`);
   };
 
   const closeCard = () => {
     window.map.element.querySelector(`.map__card`).remove();
-    deactivatePin();
   };
 
   const openCard = (cardId) => {
@@ -82,6 +87,7 @@
   window.map.element.addEventListener(`click`, (evt) => {
     if (evt.target.matches(`.popup__close`)) {
       closeCard();
+      deactivatePin();
     }
   });
 
@@ -91,14 +97,15 @@
     if (evt.key === `Escape` && window.map.element.contains(mapCard)) {
       evt.preventDefault();
       closeCard();
+      deactivatePin();
     }
   });
 
   window.map.pins.addEventListener(`click`, (evt) => {
     const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
+
     if (target) {
-      deactivatePin();
-      target.classList.add(`map__pin--active`);
+      activatePin(target);
 
       const cardId = target.dataset.id;
       openCard(cardId);
@@ -106,8 +113,13 @@
   });
 
   window.map.pins.addEventListener(`keydown`, (evt) => {
-    if (evt.key === `Enter`) {
-      openCard(evt);
+    const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
+
+    if (target && (evt.key === `Enter` || evt.key === `Space`)) {
+      activatePin(target);
+
+      const cardId = target.dataset.id;
+      openCard(cardId);
     }
   });
 })();

@@ -2,7 +2,7 @@
 
 (function () {
   const MAIN_CLICK = 0;
-  let isPageActive = false;
+  // let isPageActive = false;
 
   const activatePage = (boolean) => {
     window.form.isActive(boolean);
@@ -19,7 +19,6 @@
 
   const onMainPinEnter = (evt) => {
     if (evt.key === `Enter`) {
-      debugger;
       activatePage(true);
     }
     window.map.mainPin.removeEventListener(`mousedown`, onMainPinClick);
@@ -33,5 +32,5 @@
     activatePage,
     onMainPinClick,
     onMainPinEnter
-  }
+  };
 })();

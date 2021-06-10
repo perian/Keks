@@ -61,7 +61,7 @@
     if (activePin) {
       activePin.classList.remove(`map__pin--active`);
     }
-  }
+  };
 
   const activatePin = (target) => {
     deactivatePin();

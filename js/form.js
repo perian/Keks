@@ -21,7 +21,7 @@
 
   // Активное/неактивное состояние страницы
   const isActive = (boolean) => {
-    if(boolean) {
+    if (boolean) {
       window.utils.toggleFormElementsState(adFieldsets, false);
 
       adForm.classList.remove(`ad-form--disabled`);
@@ -67,6 +67,7 @@
   // Валидация. Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»
   const houseType = adForm.querySelector(`#type`);
   const housePrice = adForm.querySelector(`#price`);
+
   const setHouseMinPrice = () => {
     const minPrice = window.data.houseTypes[houseType.value].minPrice;
 
@@ -109,18 +110,68 @@
     moveInTime.value = moveOutTime.value;
   });
 
+  // Обработчики событий для отправки данных или получени их с сервера
+  const success = document.querySelector(`#success`).content.querySelector(`.success`);
+  const successElement = success.cloneNode(true);
+  const mainElement = document.querySelector(`main`);
+
+  const removeSuccessElement = () => {
+    successElement.removeEventListener(`click`, onSuccessElementClick);
+    document.removeEventListener(`keydown`, onSuccessElementKeydown);
+    document.querySelector(`.success`).remove();
+  };
+
+  const onSuccessElementClick = () => {
+    removeSuccessElement();
+  };
+
+  const onSuccessElementKeydown = (evt) => {
+    if (evt.key === `Escape`) {
+      removeSuccessElement();
+    }
+  };
+
+  const onSuccess = () => {
+    successElement.addEventListener(`click`, onSuccessElementClick);
+    document.addEventListener(`keydown`, onSuccessElementKeydown);
+
+    mainElement.insertAdjacentElement(`afterbegin`, successElement);
+  };
+
+  const error = document.querySelector(`#error`).content.querySelector(`.error`);
+  const errorElement = error.cloneNode(true);
+  const errorButton = errorElement.querySelector(`.error__button`);
+
+  const removeErrorElement = () => {
+    errorElement.removeEventListener(`click`, onErrorElementClick);
+    document.removeEventListener(`keydown`, onErrorElementKeydown);
+    errorButton.removeEventListener(`click`, onErrorButtonClick);
+    document.querySelector(`.error`).remove();
+  };
+
+  const onErrorElementClick = () => {
+    removeErrorElement();
+  };
+
+  const onErrorElementKeydown = (evt) => {
+    if (evt.key === `Escape`) {
+      removeErrorElement();
+    }
+  };
+
+  const onErrorButtonClick = () => {
+    removeErrorElement();
+  };
+
+  const onError = () => {
+    errorElement.addEventListener(`click`, onErrorElementClick);
+    document.addEventListener(`keydown`, onErrorElementKeydown);
+    errorButton.addEventListener(`click`, onErrorButtonClick);
+
+    mainElement.insertAdjacentElement(`afterbegin`, errorElement);
+  };
+
   // Отправка данных на сервер
-  const onSuccess = (status) => {
-    const success = document.querySelector(`#success`).content.querySelector(`.success`);
-    const successBlock = success.cloneNode(true);
-
-    console.log(status);
-  };
-
-  const onError = (errorMessage) => {
-    console.log(errorMessage);
-  };
-
   adForm.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
 

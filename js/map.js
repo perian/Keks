@@ -52,19 +52,26 @@
   window.utils.toggleFormElementsState(filterSelects, true);
 
   // Активное состояние страницы
-  const activate = () => {
-    window.utils.toggleFormElementsState(filterSelects, false);
+  const isActive = (boolean) => {
+    if (boolean) {
+      window.utils.toggleFormElementsState(filterSelects, false);
 
-    map.classList.remove(`map--faded`);
-    updateAddressField(mainPin.style.left, mainPin.style.top);
+      map.classList.remove(`map--faded`);
+      updateAddressField(mainPin.style.left, mainPin.style.top);
 
-    window.load(`GET`, LOAD_URL, onLoad, onError);
+      window.load(`GET`, LOAD_URL, onLoad, onError);
+    } else {
+      window.utils.toggleFormElementsState(filterSelects, true);
+
+      map.classList.add(`map--faded`);
+      updateAddressField(mainPin.style.left, mainPin.style.top);
+    }
   };
 
   window.map = {
     updateAddressField,
     element: map,
-    activate,
+    isActive,
     mainPin,
     pins
   };

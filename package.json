@@ -22,9 +22,6 @@
     "build": "webpack --mode production"
   },
   "engines": {
-    "node": "8.11"
-  },
-  "dependencies": {
-    "node": "^16.9.1"
+    "node": "v14.17.0"
   }
 }

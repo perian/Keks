@@ -1,78 +1,76 @@
 "use strict";
 
-(function () {
-  const LOAD_URL = `https://21.javascript.pages.academy/keksobooking/data`;
-  const MAIN_PIN_POINTER_HEIGHT = 22;
-  const map = document.querySelector(`.map`);
-  const pins = map.querySelector(`.map__pins`);
-  const filterSelects = document.querySelector(`.map__filters`).children;
-  const mainPin = pins.querySelector(`.map__pin--main`);
-  const fragment = document.createDocumentFragment();
-  let mainPinX = mainPin.style.left;
-  let mainPinY = mainPin.style.top;
+const LOAD_URL = `https://21.javascript.pages.academy/keksobooking/data`;
+const MAIN_PIN_POINTER_HEIGHT = 22;
+const map = document.querySelector(`.map`);
+const pins = map.querySelector(`.map__pins`);
+const filterSelects = document.querySelector(`.map__filters`).children;
+const mainPin = pins.querySelector(`.map__pin--main`);
+const fragment = document.createDocumentFragment();
+let mainPinX = mainPin.style.left;
+let mainPinY = mainPin.style.top;
 
-  const updateAddressField = (x, y) => {
-    const mainPinHalfHeight = mainPin.offsetHeight / 2;
-    const mainPinHalfWidth = mainPin.offsetWidth / 2;
+const updateAddressField = (x, y) => {
+  const mainPinHalfHeight = mainPin.offsetHeight / 2;
+  const mainPinHalfWidth = mainPin.offsetWidth / 2;
 
-    mainPinX = window.utils.transformToInteger(x) + mainPinHalfWidth;
-    mainPinY = window.utils.transformToInteger(y) + mainPinHalfHeight;
+  mainPinX = window.utils.transformToInteger(x) + mainPinHalfWidth;
+  mainPinY = window.utils.transformToInteger(y) + mainPinHalfHeight;
 
-    if (!map.classList.contains(`map--faded`)) {
-      mainPinY += mainPinHalfHeight + MAIN_PIN_POINTER_HEIGHT;
-    }
-    window.form.setAddressField(mainPinX, mainPinY);
-  };
-  updateAddressField(mainPinX, mainPinY);
+  if (!map.classList.contains(`map--faded`)) {
+    mainPinY += mainPinHalfHeight + MAIN_PIN_POINTER_HEIGHT;
+  }
+  window.form.setAddressField(mainPinX, mainPinY);
+};
+updateAddressField(mainPinX, mainPinY);
 
-  const onLoad = (ads) => {
-    window.data.ads = ads;
-    const features = window.data.createFeatures(ads);
+const onLoad = (ads) => {
+  window.data.ads = ads;
+  const features = window.data.createFeatures(ads);
 
-    for (let i = 0; i < ads.length; i++) {
-      fragment.appendChild(window.createPin(features[i]));
-    }
+  for (let i = 0; i < ads.length; i++) {
+    fragment.appendChild(window.createPin(features[i]));
+  }
 
-    pins.appendChild(fragment);
-  };
+  pins.appendChild(fragment);
+};
 
-  const onError = function (errorMessage) {
-    const node = document.createElement(`div`);
-    node.style = `z-index: 100; margin: 0 auto; text-align: center; background-color: red;`;
-    node.style.position = `absolute`;
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = `30px`;
+const onError = function (errorMessage) {
+  const node = document.createElement(`div`);
+  node.style = `z-index: 100; margin: 0 auto; text-align: center; background-color: red;`;
+  node.style.position = `absolute`;
+  node.style.left = 0;
+  node.style.right = 0;
+  node.style.fontSize = `30px`;
 
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement(`afterbegin`, node);
-  };
+  node.textContent = errorMessage;
+  document.body.insertAdjacentElement(`afterbegin`, node);
+};
 
-  // Неактивное состояние страницы
-  window.utils.toggleFormElementsState(filterSelects, true);
+// Неактивное состояние страницы
+window.utils.toggleFormElementsState(filterSelects, true);
 
-  // Активное состояние страницы
-  const isActive = (boolean) => {
-    if (boolean) {
-      window.utils.toggleFormElementsState(filterSelects, false);
+// Активное состояние страницы
+const isActive = (boolean) => {
+  if (boolean) {
+    window.utils.toggleFormElementsState(filterSelects, false);
 
-      map.classList.remove(`map--faded`);
-      updateAddressField(mainPin.style.left, mainPin.style.top);
+    map.classList.remove(`map--faded`);
+    updateAddressField(mainPin.style.left, mainPin.style.top);
 
-      window.load(`GET`, LOAD_URL, onLoad, onError);
-    } else {
-      window.utils.toggleFormElementsState(filterSelects, true);
+    window.load(`GET`, LOAD_URL, onLoad, onError);
+  } else {
+    window.utils.toggleFormElementsState(filterSelects, true);
 
-      map.classList.add(`map--faded`);
-      updateAddressField(mainPin.style.left, mainPin.style.top);
-    }
-  };
+    map.classList.add(`map--faded`);
+    updateAddressField(mainPin.style.left, mainPin.style.top);
+  }
+};
 
-  window.map = {
-    updateAddressField,
-    element: map,
-    isActive,
-    mainPin,
-    pins
-  };
-})();
+window.map = {
+  updateAddressField,
+  element: map,
+  isActive,
+  mainPin,
+  pins
+};

@@ -55,26 +55,13 @@ const createCard = (card) => {
 // Создаем и добавляем на страницу карточку обьявления на основе элемента из массива обьявлений
 const filtersContainer = window.map.element.querySelector(`.map__filters-container`);
 
-const deactivatePin = () => {
-  const activePin = window.map.element.querySelector(`.map__pin--active`);
-  if (activePin) {
-    activePin.classList.remove(`map__pin--active`);
-  }
-};
-
-const activatePin = (target) => {
-  deactivatePin();
-
-  target.classList.add(`map__pin--active`);
-};
-
-const closeCard = () => {
+const hide = () => {
   window.map.element.querySelector(`.map__card`).remove();
 };
 
-const openCard = (cardId) => {
+const show = (cardId) => {
   if (window.map.element.querySelector(`.map__card`)) {
-    closeCard();
+    hide();
   }
 
   const targetOffer = window.data.ads[cardId];
@@ -85,8 +72,8 @@ const openCard = (cardId) => {
 
 window.map.element.addEventListener(`click`, (evt) => {
   if (evt.target.matches(`.popup__close`)) {
-    closeCard();
-    deactivatePin();
+    hide();
+    window.pin.deactivate();
   }
 });
 
@@ -95,29 +82,11 @@ document.addEventListener(`keydown`, (evt) => {
 
   if (evt.key === `Escape` && window.map.element.contains(mapCard)) {
     evt.preventDefault();
-    closeCard();
-    deactivatePin();
+    hide();
+    window.pin.deactivate();
   }
 });
 
-window.map.pins.addEventListener(`click`, (evt) => {
-  const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
-
-  if (target) {
-    activatePin(target);
-
-    const cardId = target.dataset.id;
-    openCard(cardId);
-  }
-});
-
-window.map.pins.addEventListener(`keydown`, (evt) => {
-  const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
-
-  if (target && (evt.key === `Enter` || evt.key === `Space`)) {
-    activatePin(target);
-
-    const cardId = target.dataset.id;
-    openCard(cardId);
-  }
-});
+window.card = {
+  show
+};

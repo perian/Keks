@@ -4,7 +4,7 @@ const MAP_PIN_WIDTH = 50;
 const MAP_PIN_HEIGHT = 70;
 const pinTemplate = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
 
-window.createPin = (pin) => {
+const render = (pin) => {
   const pinElement = pinTemplate.cloneNode(true);
   const img = pinElement.querySelector(`img`);
 
@@ -16,4 +16,44 @@ window.createPin = (pin) => {
   pinElement.dataset.id = pin.id;
 
   return pinElement;
+};
+
+const deactivate = () => {
+  const activePin = window.map.element.querySelector(`.map__pin--active`);
+  if (activePin) {
+    activePin.classList.remove(`map__pin--active`);
+  }
+};
+
+const activate = (target) => {
+  deactivate();
+
+  target.classList.add(`map__pin--active`);
+};
+
+window.map.pins.addEventListener(`click`, (evt) => {
+  const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
+
+  if (target) {
+    activate(target);
+
+    const cardId = target.dataset.id;
+    window.card.show(cardId);
+  }
+});
+
+window.map.pins.addEventListener(`keydown`, (evt) => {
+  const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
+
+  if (target && (evt.key === `Enter` || evt.key === `Space`)) {
+    activate(target);
+
+    const cardId = target.dataset.id;
+    window.card.show(cardId);
+  }
+});
+
+window.pin = {
+  render,
+  deactivate
 };

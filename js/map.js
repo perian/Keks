@@ -29,7 +29,7 @@ const onLoad = (ads) => {
   const features = window.data.createFeatures(ads);
 
   for (let i = 0; i < ads.length; i++) {
-    fragment.appendChild(window.createPin(features[i]));
+    fragment.appendChild(window.pin.render(features[i]));
   }
 
   pins.appendChild(fragment);

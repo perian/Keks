@@ -24,29 +24,6 @@
   };
   updateAddressField(mainPinX, mainPinY);
 
-  const onLoad = (ads) => {
-    window.data.ads = ads;
-    const features = window.data.createFeatures(ads);
-
-    for (let i = 0; i < ads.length; i++) {
-      fragment.appendChild(window.pin.render(features[i]));
-    }
-
-    pins.appendChild(fragment);
-  };
-
-  const onError = function (errorMessage) {
-    const node = document.createElement(`div`);
-    node.style = `z-index: 100; margin: 0 auto; text-align: center; background-color: red;`;
-    node.style.position = `absolute`;
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = `30px`;
-
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement(`afterbegin`, node);
-  };
-
   // Неактивное состояние страницы
   window.utils.toggleFormElementsState(filterSelects, true);
 
@@ -65,6 +42,31 @@
       map.classList.add(`map--faded`);
       updateAddressField(mainPin.style.left, mainPin.style.top);
     }
+  };
+
+  const onLoad = (ads) => {
+    window.data.ads = ads;
+    const features = window.data.createFeatures(ads);
+
+    for (let i = 0; i < ads.length; i++) {
+      fragment.appendChild(window.pin.render(features[i]));
+    }
+
+    pins.appendChild(fragment);
+  };
+
+  const onError = function (errorMessage) {
+    window.utils.toggleFormElementsState(filterSelects, true);
+
+    const node = document.createElement(`div`);
+    node.style = `z-index: 100; margin: 0 auto; text-align: center; background-color: red;`;
+    node.style.position = `absolute`;
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = `30px`;
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement(`afterbegin`, node);
   };
 
   window.map = {

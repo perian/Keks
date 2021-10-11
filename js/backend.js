@@ -4,7 +4,6 @@
     const xhr = new XMLHttpRequest();
     xhr.responseType = `json`;
 
-
     xhr.addEventListener(`load`, () => {
       let error;
       switch (xhr.status) {

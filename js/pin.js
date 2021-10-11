@@ -8,8 +8,8 @@
     const pinElement = pinTemplate.cloneNode(true);
     const img = pinElement.querySelector(`img`);
 
-    pinElement.style.left = pin.location.x + PIN_WIDTH / 2 + `px`;
-    pinElement.style.top = pin.location.y + PIN_HEIGHT + `px`;
+    pinElement.style.left = pin.location.x - PIN_WIDTH / 2 + `px`;
+    pinElement.style.top = pin.location.y - PIN_HEIGHT + `px`;
     img.src = pin.author.avatar;
     img.alt = pin.offer.description;
     img.dataset.id = pin.id;

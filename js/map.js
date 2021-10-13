@@ -3,10 +3,8 @@
   const LOAD_URL = `https://21.javascript.pages.academy/keksobooking/data`;
   const MAIN_PIN_POINTER_HEIGHT = 22;
   const map = document.querySelector(`.map`);
-  const pins = map.querySelector(`.map__pins`);
   const filterSelects = document.querySelector(`.map__filters`).children;
-  const mainPin = pins.querySelector(`.map__pin--main`);
-  const fragment = document.createDocumentFragment();
+  const mainPin = map.querySelector(`.map__pin--main`);
   let mainPinX = mainPin.style.left;
   let mainPinY = mainPin.style.top;
 
@@ -44,15 +42,22 @@
     }
   };
 
+  const updatePins = (ads) => {
+    window.pin.render(ads);
+  };
+
+  const houseTypeFilter = document.querySelector(`#housing-type`);
+  houseTypeFilter.addEventListener(`change`, function() {
+    window.data.ads.filter(function(ads) {
+      console.log('works');
+      ads.offer.type === 'bungalow';
+      updatePins(ads);
+    });
+  });
+
   const onLoad = (ads) => {
     window.data.ads = ads;
-    const features = window.data.createFeatures(ads);
-
-    for (let i = 0; i < ads.length; i++) {
-      fragment.appendChild(window.pin.render(features[i]));
-    }
-
-    pins.appendChild(fragment);
+    updatePins(ads);
   };
 
   const onError = function (errorMessage) {
@@ -73,7 +78,6 @@
     updateAddressField,
     element: map,
     isActive,
-    mainPin,
-    pins
+    mainPin
   };
 })();

@@ -2,9 +2,10 @@
 (function () {
   const PIN_WIDTH = 50;
   const PIN_HEIGHT = 70;
+  const MAX_PIN_AMOUNT = 5;
   const pinTemplate = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
 
-  const render = (pin) => {
+  const renderPin = (pin) => {
     const pinElement = pinTemplate.cloneNode(true);
     const img = pinElement.querySelector(`img`);
 
@@ -18,8 +19,25 @@
     return pinElement;
   };
 
+  const pins = document.querySelector(`.map__pins`);
+  const fragment = document.createDocumentFragment();
+
+  const render = (ads) => {
+    const features = window.data.createFeatures(ads);
+
+    const takeNumber = MAX_PIN_AMOUNT < ads.length
+      ? MAX_PIN_AMOUNT
+      : ads.length
+
+    for (let i = 0; i < takeNumber; i++) {
+      fragment.appendChild(renderPin(features[i]));
+    }
+
+    pins.appendChild(fragment);
+  };
+
   const deactivate = () => {
-    const activePin = window.map.element.querySelector(`.map__pin--active`);
+    const activePin = document.querySelector(`.map__pin--active`);
     if (activePin) {
       activePin.classList.remove(`map__pin--active`);
     }
@@ -31,7 +49,7 @@
     target.classList.add(`map__pin--active`);
   };
 
-  window.map.pins.addEventListener(`click`, (evt) => {
+  pins.addEventListener(`click`, (evt) => {
     const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
 
     if (target) {
@@ -42,7 +60,7 @@
     }
   });
 
-  window.map.pins.addEventListener(`keydown`, (evt) => {
+  pins.addEventListener(`keydown`, (evt) => {
     const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
 
     if (target && (evt.key === `Enter` || evt.key === `Space`)) {

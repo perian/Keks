@@ -23,11 +23,11 @@
   const fragment = document.createDocumentFragment();
 
   const render = (ads) => {
+    window.filter.allPins = ads;
     const features = window.data.createFeatures(ads);
-
     const takeNumber = MAX_PIN_AMOUNT < ads.length
       ? MAX_PIN_AMOUNT
-      : ads.length
+      : ads.length;
 
     for (let i = 0; i < takeNumber; i++) {
       fragment.appendChild(renderPin(features[i]));

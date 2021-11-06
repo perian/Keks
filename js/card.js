@@ -10,7 +10,7 @@
 
     newCard.querySelector(`.popup__title`).textContent = card.offer.title;
     newCard.querySelector(`.popup__text--address`).textContent = card.offer.address;
-    newCard.querySelector(`.popup__text--price`).textContent = `${card.offer.price}₽/ночь`;
+    newCard.querySelector(`.popup__text--price`).textContent = `${card.offer.price}₴/ночь`;
     newCard.querySelector(`.popup__type`).textContent = window.data.houseTypes[card.offer.type].name;
     newCard.querySelector(`.popup__text--capacity`).textContent = `${card.offer.rooms} комнаты для ${card.offer.guests} гостей`;
     newCard.querySelector(`.popup__text--time`).textContent = `Заезд после ` + card.offer.checkin + `, выезд до ` + card.offer.checkout;
@@ -56,15 +56,17 @@
   const filtersContainer = window.map.element.querySelector(`.map__filters-container`);
 
   const hide = () => {
-    window.map.element.querySelector(`.map__card`).remove();
+    const mapCard = window.map.element.querySelector(`.map__card`);
+
+    if (mapCard) {
+      mapCard.remove();
+    }
   };
 
   const show = (cardId) => {
-    if (window.map.element.querySelector(`.map__card`)) {
-      hide();
-    }
+    hide();
 
-    const targetOffer = window.data.ads[cardId];
+    const targetOffer = window.filter.allPins[cardId];
     const card = createCard(targetOffer);
 
     window.map.element.insertBefore(card, filtersContainer);
@@ -88,6 +90,7 @@
   });
 
   window.card = {
-    show
+    show,
+    hide
   };
 })();

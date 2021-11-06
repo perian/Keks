@@ -42,22 +42,9 @@
     }
   };
 
-  const updatePins = (ads) => {
-    window.pin.render(ads);
-  };
-
-  const houseTypeFilter = document.querySelector(`#housing-type`);
-  houseTypeFilter.addEventListener(`change`, function() {
-    window.data.ads.filter(function(ads) {
-      console.log('works');
-      ads.offer.type === 'bungalow';
-      updatePins(ads);
-    });
-  });
-
-  const onLoad = (ads) => {
-    window.data.ads = ads;
-    updatePins(ads);
+  const onLoad = (data) => {
+    window.data.ads = data;
+    window.pin.render(window.data.ads);
   };
 
   const onError = function (errorMessage) {

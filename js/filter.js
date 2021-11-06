@@ -3,10 +3,25 @@
 (function () {
   const pins = document.querySelector(`.map__pins`);
   const houseType = document.querySelector(`#housing-type`);
+  const housePrice = document.querySelector(`#housing-price`);
   const houseRooms = document.querySelector(`#housing-rooms`);
-  // const housePrice = document.querySelector(`#housing-price`);
-  // const houseGuests = document.querySelector(`#housing-guests`);
-  // const houseFeatures = document.querySelector(`#housing-features`);
+  const houseGuests = document.querySelector(`#housing-guests`);
+  const houseFeatures = document.querySelector(`#housing-features`);
+
+  const HousePrice = {
+    low: {
+      min: 0,
+      max: 9999
+    },
+    middle: {
+      min: 10000,
+      max: 49999
+    },
+    high: {
+      min: 50000,
+      max: Infinity
+    }
+  };
 
   const deletePins = () => {
     const currentPins = pins.querySelectorAll(`.map__pin:not(.map__pin--main)`);
@@ -21,24 +36,37 @@
   const updatePins = () => {
     allPins = window.data.ads;
 
-    let houseTypeFilter = allPins.filter(function (ad) {
+    let filteredAds = allPins.filter(function (ad) {
       if (houseType.value === `any`) {
         return allPins;
       }
+
       return ad.offer.type === houseType.value;
-    });
-
-    let houseRoomsFilter = houseTypeFilter.filter(function (ad) {
-      if (houseRooms.value === `any`) {
-        return houseTypeFilter;
+    }).
+    filter(function (ad) {
+      if (housePrice.value === `any`) {
+        return allPins;
       }
+
+      return ad.offer.price >= HousePrice[housePrice.value].min && ad.offer.price <= HousePrice[housePrice.value].max;
+    }).
+    filter(function (ad) {
+      if (houseRooms.value === `any`) {
+        return allPins;
+      }
+
       return ad.offer.rooms === Number(houseRooms.value);
+    }).
+    filter(function (ad) {
+      if (houseGuests.value === `any`) {
+        return allPins;
+      }
+
+      return ad.offer.guests === Number(houseGuests.value);
     });
 
-    let filteredPins = houseRoomsFilter;
-
-    allPins = filteredPins.filter(function (pin, index) {
-      return filteredPins.indexOf(pin) === index;
+    allPins = filteredAds.filter(function (pin, index) {
+      return filteredAds.indexOf(pin) === index;
     });
 
     deletePins();
@@ -52,6 +80,16 @@
   });
 
   houseRooms.addEventListener(`change`, function () {
+    window.card.hide();
+    updatePins();
+  });
+
+  housePrice.addEventListener(`change`, function () {
+    window.card.hide();
+    updatePins();
+  });
+
+  houseGuests.addEventListener(`change`, function () {
     window.card.hide();
     updatePins();
   });

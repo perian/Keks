@@ -1,6 +1,7 @@
 "use strict";
 (function () {
   const MAIN_CLICK = 0;
+  const mainPin = window.map.mainPin;
   // let isPageActive = false;
 
   const activatePage = (boolean) => {
@@ -12,20 +13,20 @@
     if (evt.button === MAIN_CLICK) {
       activatePage(true);
     }
-    window.map.mainPin.removeEventListener(`mousedown`, onMainPinClick);
-    window.map.mainPin.removeEventListener(`keydown`, onMainPinEnter);
+    mainPin.removeEventListener(`mousedown`, onMainPinClick);
+    mainPin.removeEventListener(`keydown`, onMainPinEnter);
   };
 
   const onMainPinEnter = (evt) => {
     if (evt.key === `Enter`) {
       activatePage(true);
     }
-    window.map.mainPin.removeEventListener(`mousedown`, onMainPinClick);
-    window.map.mainPin.removeEventListener(`keydown`, onMainPinEnter);
+    mainPin.removeEventListener(`mousedown`, onMainPinClick);
+    mainPin.removeEventListener(`keydown`, onMainPinEnter);
   };
 
-  window.map.mainPin.addEventListener(`mousedown`, onMainPinClick);
-  window.map.mainPin.addEventListener(`keydown`, onMainPinEnter);
+  mainPin.addEventListener(`mousedown`, onMainPinClick);
+  mainPin.addEventListener(`keydown`, onMainPinEnter);
 
   window.main = {
     activatePage,

@@ -55,7 +55,7 @@
   // Создаем и добавляем на страницу карточку обьявления на основе элемента из массива обьявлений
   const filtersContainer = window.map.element.querySelector(`.map__filters-container`);
 
-  const hide = () => {
+  const hideCard = () => {
     const mapCard = window.map.element.querySelector(`.map__card`);
 
     if (mapCard) {
@@ -63,10 +63,10 @@
     }
   };
 
-  const show = (cardId) => {
-    hide();
+  const showCard = (cardId) => {
+    hideCard();
 
-    const targetOffer = window.filter.allPins[cardId];
+    const targetOffer = window.data.filteredAds[cardId];
     const card = createCard(targetOffer);
 
     window.map.element.insertBefore(card, filtersContainer);
@@ -74,7 +74,7 @@
 
   window.map.element.addEventListener(`click`, (evt) => {
     if (evt.target.matches(`.popup__close`)) {
-      hide();
+      hideCard();
       window.pin.deactivate();
     }
   });
@@ -84,13 +84,13 @@
 
     if (evt.key === `Escape` && window.map.element.contains(mapCard)) {
       evt.preventDefault();
-      hide();
+      hideCard();
       window.pin.deactivate();
     }
   });
 
   window.card = {
-    show,
-    hide
+    show: showCard,
+    hide: hideCard
   };
 })();

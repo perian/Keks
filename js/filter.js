@@ -1,7 +1,6 @@
 "use strict";
 
 (function () {
-  const pins = document.querySelector(`.map__pins`);
   const houseType = document.querySelector(`#housing-type`);
   const housePrice = document.querySelector(`#housing-price`);
   const houseRooms = document.querySelector(`#housing-rooms`);
@@ -23,43 +22,31 @@
     }
   };
 
-  const deletePins = () => {
-    const currentPins = pins.querySelectorAll(`.map__pin:not(.map__pin--main)`);
-
-    for (let i = 0; i < currentPins.length; i++) {
-      const pin = document.querySelector(`.map__pin:not(.map__pin--main)`);
-      pin.parentNode.removeChild(pin);
-    }
-  };
-
-  let allPins = [];
-  const updatePins = () => {
-    allPins = window.data.ads;
-
-    let filteredAds = allPins.filter(function (ad) {
+  const filterAds = () => {
+    let filteredAds = window.data.ads.filter(function (ad) {
       if (houseType.value === `any`) {
-        return allPins;
+        return ad;
       }
 
       return ad.offer.type === houseType.value;
     }).
     filter(function (ad) {
       if (housePrice.value === `any`) {
-        return allPins;
+        return ad;
       }
 
       return ad.offer.price >= HousePrice[housePrice.value].min && ad.offer.price <= HousePrice[housePrice.value].max;
     }).
     filter(function (ad) {
       if (houseRooms.value === `any`) {
-        return allPins;
+        return ad;
       }
 
       return ad.offer.rooms === Number(houseRooms.value);
     }).
     filter(function (ad) {
       if (houseGuests.value === `any`) {
-        return allPins;
+        return ad;
       }
 
       return ad.offer.guests === Number(houseGuests.value);
@@ -76,25 +63,15 @@
       return true;
     });
 
-    allPins = filteredAds.filter(function (pin, index) {
-      return filteredAds.indexOf(pin) === index;
-    });
-
-    deletePins();
-
-    window.pin.render(allPins);
+    return filteredAds;
   };
-
-  const mapFilters = document.querySelector(`.map__filters`);
 
   const onChangeFilter = function () {
     window.card.hide();
-    updatePins();
+    window.pin.remove();
+    window.pin.render(filterAds());
   };
 
+  const mapFilters = document.querySelector(`.map__filters`);
   mapFilters.addEventListener(`change`, window.utils.debounce(onChangeFilter));
-
-  window.filter = {
-    allPins
-  };
 })();

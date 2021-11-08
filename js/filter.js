@@ -92,7 +92,7 @@
     updatePins();
   };
 
-  mapFilters.addEventListener(`change`, onChangeFilter);
+  mapFilters.addEventListener(`change`, window.utils.debounce(onChangeFilter));
 
   window.filter = {
     allPins

@@ -63,6 +63,17 @@
       }
 
       return ad.offer.guests === Number(houseGuests.value);
+    }).
+    filter(function (ad) {
+      const chosenFeatures = houseFeatures.querySelectorAll(`input[name=features]:checked`);
+
+      for (let i = 0; i < chosenFeatures.length; i++) {
+        if (!ad.offer.features.includes(chosenFeatures[i].value)) {
+          return false;
+        }
+      }
+
+      return true;
     });
 
     allPins = filteredAds.filter(function (pin, index) {
@@ -74,25 +85,14 @@
     window.pin.render(allPins);
   };
 
-  houseType.addEventListener(`change`, function () {
-    window.card.hide();
-    updatePins();
-  });
+  const mapFilters = document.querySelector(`.map__filters`);
 
-  houseRooms.addEventListener(`change`, function () {
+  const onChangeFilter = function () {
     window.card.hide();
     updatePins();
-  });
+  };
 
-  housePrice.addEventListener(`change`, function () {
-    window.card.hide();
-    updatePins();
-  });
-
-  houseGuests.addEventListener(`change`, function () {
-    window.card.hide();
-    updatePins();
-  });
+  mapFilters.addEventListener(`change`, onChangeFilter);
 
   window.filter = {
     allPins

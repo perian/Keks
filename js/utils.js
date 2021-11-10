@@ -1,6 +1,8 @@
 "use strict";
 
 (function () {
+  const DEBOUNCE_INTERVAL = 300; // ms
+
   window.utils = {
     getRandomInt: (min, max) => {
       min = Math.ceil(min);
@@ -21,6 +23,18 @@
       for (let element of domElements) {
         element.disabled = exist;
       }
+    },
+    debounce: (cb) => {
+      let lastTimeout = null;
+
+      return function () {
+        if (lastTimeout) {
+          window.clearTimeout(lastTimeout);
+        }
+        lastTimeout = window.setTimeout(function () {
+          cb();
+        }, DEBOUNCE_INTERVAL);
+      };
     }
   };
 })();

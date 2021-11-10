@@ -22,8 +22,8 @@
   const pins = document.querySelector(`.map__pins`);
   const fragment = document.createDocumentFragment();
 
-  const render = (ads) => {
-    window.filter.allPins = ads;
+  const renderPins = (ads) => {
+    window.data.filteredAds = ads;
     const features = window.data.createFeatures(ads);
     const takeNumber = MAX_PIN_AMOUNT < ads.length
       ? MAX_PIN_AMOUNT
@@ -36,24 +36,33 @@
     pins.appendChild(fragment);
   };
 
-  const deactivate = () => {
+  const deactivatePin = () => {
     const activePin = document.querySelector(`.map__pin--active`);
     if (activePin) {
       activePin.classList.remove(`map__pin--active`);
     }
   };
 
-  const activate = (target) => {
-    deactivate();
+  const activatePin = (target) => {
+    deactivatePin();
 
     target.classList.add(`map__pin--active`);
+  };
+
+  const removePins = () => {
+    const currentPins = pins.querySelectorAll(`.map__pin:not(.map__pin--main)`);
+
+    for (let i = 0; i < currentPins.length; i++) {
+      const pin = document.querySelector(`.map__pin:not(.map__pin--main)`);
+      pin.parentNode.removeChild(pin);
+    }
   };
 
   pins.addEventListener(`click`, (evt) => {
     const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
 
     if (target) {
-      activate(target);
+      activatePin(target);
 
       const cardId = target.dataset.id;
       window.card.show(cardId);
@@ -64,7 +73,7 @@
     const target = evt.target.closest(`.map__pin:not(.map__pin--main)`);
 
     if (target && (evt.key === `Enter` || evt.key === `Space`)) {
-      activate(target);
+      activatePin(target);
 
       const cardId = target.dataset.id;
       window.card.show(cardId);
@@ -72,7 +81,8 @@
   });
 
   window.pin = {
-    render,
-    deactivate
+    render: renderPins,
+    deactivate: deactivatePin,
+    remove: removePins
   };
 })();

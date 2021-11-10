@@ -1,6 +1,10 @@
 "use strict";
 
 (function () {
+  const PRICE_MIN = 0;
+  const PRICE_MIDDLE_MIN = 10000;
+  const PRICE_MIDDLE_MAX = 50000;
+  const PRICE_MAX = Infinity;
   const houseType = document.querySelector(`#housing-type`);
   const housePrice = document.querySelector(`#housing-price`);
   const houseRooms = document.querySelector(`#housing-rooms`);
@@ -9,16 +13,16 @@
 
   const HousePrice = {
     low: {
-      min: 0,
-      max: 9999
+      min: PRICE_MIN,
+      max: PRICE_MIDDLE_MIN
     },
     middle: {
-      min: 10000,
-      max: 49999
+      min: PRICE_MIDDLE_MIN,
+      max: PRICE_MIDDLE_MAX
     },
     high: {
-      min: 50000,
-      max: Infinity
+      min: PRICE_MIDDLE_MAX,
+      max: PRICE_MAX
     }
   };
 
@@ -35,7 +39,7 @@
         return ad;
       }
 
-      return ad.offer.price >= HousePrice[housePrice.value].min && ad.offer.price <= HousePrice[housePrice.value].max;
+      return ad.offer.price >= HousePrice[housePrice.value].min && ad.offer.price < HousePrice[housePrice.value].max;
     }).
     filter(function (ad) {
       if (houseRooms.value === `any`) {
